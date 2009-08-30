@@ -1,0 +1,320 @@
+2003-11-29  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.8.2.
+	
+	* main.c (ND_USAGE): Updated.
+
+	* nd.h (ndPropFindAll): Abolish.
+	(ndPropFind): Changed API.
+
+	* nd.c (nd_propfind_query): New function.
+	(ndPropFindAll): Abolish.
+	(ndPropFind): Changed API; Implementation for retrival of specified
+	property.
+
+	* main.c (main): Re-implemented 'g' behavior;
+	Use ndPropFind instead of ndPropFindAll.
+
+2003-11-28  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.c (nd_lock_request): Use snprintf instead of sprintf.
+
+2003-11-27  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.8.1.
+
+	* nd.c (ndHTTPMethod): Use snprintf instead of sprintf.
+	(ndPropPatch): Ditto.
+	(ndPut): Ditto.
+	(ndDelete): Ditto.
+	(nd_lock_request): Ditto.
+	(ndUnlock): Ditto.
+	(ndMkCol): Ditto.
+	(ndMove): Ditto.
+	(ndCopy): Ditto.
+
+2003-11-26  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.8.0.
+	
+	* nd.h (ND_REQUEST_MAX): Renamed from ND_LOCK_REQUEST_MAX_LENGTH.
+	(ndProp,ndPropPtr): New structure.
+	(ndNodeInfo): New member `props'.
+
+	* nd.c (ndNodeInfoFree): Treat props.
+	(ndNodeInfoPrint): Ditto.
+	(ndPropNew): New function.
+	(ndPropFree): Ditto.
+	(ndPropListFree): Ditto.
+	(ndPropPrint): Ditto.
+	(ndPropListPrint): Ditto.
+	(nd_propfind_all_query): Renamed from nd_propfind_query.
+	(nd_parse_prop): Ignore supportedlock and getetag;
+	Treat other properties other than DAV: namespace.
+	(nd_parse_propstat): Return code.
+	(nd_parse_response): Setup code for propstat.
+	(nd_parse_multistatus): Renamed from nd_parse_prop_answer.
+	(ndPropFindAll): Renamed from ndPropFind.
+	(ndPropFind): New implementation (Not implemented yet).
+	(ndPropPatch): New function.
+	(ndPut): Avoid buffer overflow.
+	(ndPut): Use nd_parse_multistatus instead of nd_parse_prop_answer.
+	(ndDelete): Avoid buffer overflow.
+	(nd_lock_request): Ditto.
+	(ndUnlock): Ditto.
+	(ndMkCol): Ditto.
+	(ndMove): Ditto.
+	(ndCopy): Ditto.
+
+	* main.c (ND_USAGE): Added -e and -N.
+	(main): Process e, g, N options;
+	Use ndPropFindAll instead of ndPropFind.
+
+2003-10-15  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.7.2.
+	
+	* nd.c: Include ctype.h
+	(nd_dav_request): Remove unused variables.
+	(nd_dav_name_equal): Changed definition order.
+	(nd_parse_response): Return NULL when error.
+	(nd_parse_lock_answer): Remove unused variable.
+	(ndReasonPhrase): Return ND_CODE_OTHER if none matched.
+
+	* main.c: Include nanohttp.h.
+	(error_exit): Correct ambiguous else.
+
+	* auth.c: Include string.h, ctype.h.
+	(ndAuthParamCreate): Remove unused variable; Return NULL when error.
+
+2003-10-14  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* missing: Update.
+
+	* auth.c (ndAuthCreateHeader): Don't call ndAuthParamCreate if hauth
+	is NULL.
+
+2003-07-19  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.7.1.
+	* depcomp: New file. 
+
+2003-06-16  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* main.c (ND_USAGE): Fix multiline string.
+	(http://bugs.debian.org/197614)
+
+2003-03-06  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.7.0.
+
+2003-02-23  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.c (ndNodeInfoFree): Free restype.
+	(ndNodeInfoPrint): Print Resource-Type field.
+	(ndLockInfoListFree): New function.
+	(ndLockInfoListPrint): New function.
+	(nd_parse_prop): Parse `resourcetype' attribute.
+
+2002-10-08  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.6.0.
+
+	* Changed license to MPL/GPL/LGPL.
+	
+	* nd.c (ndLockInfoNew): Fixed serious bug which breaks memory.
+
+2002-09-07  Erik Warendorph <erik.warendorph@start.no>
+
+	* main.c (authenticate): Use stderr instead of stdout to prompt
+	username.
+
+2002-03-11  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* Version 0.5.0.
+	
+	* main.c (main): Call ndFreeAuthCtxt.
+	(usage): Print version number.
+
+	* nd.1: Added -a and -A.
+
+	* nd.h (_nd_auth_ctxt): New structure.
+	(DAV API): Changed authentication API.
+
+	* nd.c: Follow the changes above.
+	(ndHTTPMethod): If auth realm of proxy auth realm is specified,
+	specify autorization header at first request.
+
+	* main.c (ND_USAGE): Added -a and -A.
+	(main): Likewise.
+
+	* auth.c (ndAuthCreateHeader): Add CRLF.
+	(ndCreateAuthCtxt): New function.
+	(ndFreeAuthCtxt): Ditto.
+
+2002-02-28  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* auth.c (ndAuthCreateHeader): Proxy authentication support.
+
+	* nd.h (ndAuthCallback): Added is_proxy argument.
+	(ndAuthCreateHeader): Ditto.
+
+	* nd.c (ndHTTPMethod): Proxy authentication support.
+
+2002-02-27  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* main.c (null_error_handler): New function.
+	(main): Register null_error_handler as xmlGenericErrorFunc.
+
+	* nd.c: Some local function name rearrangements.
+	
+	* nd.c (nd_dav_name_equal): New function to check namespace "DAV:".
+	All node name comparison portions are changed.
+
+	* nd.h (_nd_node_info): Added cdate, status.
+	(ndAuthNotifyCallback): New authentication API.
+	(ndAuthCreateHeader): Changed return value.
+	(DAV_API): Added notify_cb as a third argument.
+
+	* nd.c: Follow the changes above.
+	(ndNodeInfoPrint): Don't print when no value.
+	(ndHTTPMethod): Call notify_cb just after authentication (even when
+	there's no authentication);
+	(parse_propfind_response): Set status.
+	(ndPut): Parse result.
+	(nd_lock_request): Don't set Lock depth as 1.
+
+	* main.c (auth_notify): New function.
+	(main): Get PUT result.
+
+2002-02-25  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.h (ND_DEPTH_...): New macro.
+	(ndMove): New function.
+	(ndCopy): Ditto.
+
+	* nd.c (propfind_query): Added depth argument.
+	(ndPropFind): Ditto.
+	(nd_lock_request): Ditto.
+	(ndLock): Ditto.
+	(ndUnlock): Ditto.
+	(ndMove): New function.
+	(ndCopy): Ditto.
+
+	* main.c (main): Implemented '-c', '-m', '-f', and '-r'.
+
+	* nd.c (ndPost): Implemented.
+	(ndPostPrint): Ditto.
+	(ndHTTPMethod): Stop when fn is NULL.
+
+	* main.c (ND_USAGE): Use -p instead of -w, Added -P.
+	(main): Follow the changes above; Implemented 'P'
+
+2002-02-24  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.1: New file.
+
+	* nd.c (ndLock): Return status code even when buf is NULL.
+	(ndMkCol): New function.
+
+	* nd.h (ndMkCol): New function.
+	(ndPost, ndPostPrint): New protptype(not implemented yet).
+
+	* main.c (main): Use ndGetPrint instead of ndGet when
+	WAIT_FOR_END is not defined.
+	(error_exit): New function.
+	(ND_USAGE): Added -k, -c, -h, -r, -e and changed meaning of -p, -f.
+	(main): Follow the changes above.
+
+	* nd.h (ND_PRINT_AS_HEADER): New macro.
+	(ND_PRINT_AS_SEXP): Ditto.
+	(ND_CODE_...): Ditto.
+	(ndNodeInfoPrint): Changed API (added format argument).
+	(ndNodeInfoListPrint): Ditto.
+	(ndLockInfoPrint): Ditto.
+	(ndReasonPhrase): New function.
+	(ndStrdup): Abolish.
+	(ndPropFind): Changed API (Return status code and added argument for
+	return ndNodeInfoPtr).
+	(ndLock): Likewise.
+	(ndGet): Likewise.
+
+	* nd.c: Follow the changes above.
+
+	* main.c: Follow the API change above.
+	(Getopt): Rewote.
+	(main): Added -f, -o, -s, -i; don't require timeout argument for -l.
+	(ND_USAGE): Follow the chage above.
+
+	* auth.c (ndAuthParamCreateBasic): Use xmlMemStrdup instead of
+	ndStrdup.
+	(ndAuthParamSetValue): Ditto.
+
+2002-02-22  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.c (ndNodeInfoFree): Free lock.
+	(ndNodeInfoPrint): Changed output format completely.
+	(ndLockInfoPrint): Ditto.
+	(ndHTTPMethod): Fixed fatal bug.
+	(nd_parse_lockdiscovery): New function.
+	(nd_parse_lock_answer): Use it.
+	(nd_lock_request): Set Lock Depth as 0.
+
+	* nd.h (ndLockInfo): Renamed from ndLockCtxt.
+	(ndNodeInfo): Added lock.
+
+	* main.c (ND_USAGE): Fix.
+	(main): Follow the name change of ndNodeLockInfoPtr.
+
+	* nd.h (_nd_auth_param): New structure.
+	(ndStrdup): New API.
+	(ndAuthCallback): Ditto.
+	(ndAuthParamValue): Ditto.
+	(ndAuthParamSetValue): Ditto.
+	(ndAuthCreateHeader): Ditto.
+	(DAV_API): Added fn argument as a second argument.
+
+	* nd.c (ndNodeInfoFree): Fix memory leak.
+	(ndLockCtxtFree): Ditto.
+	(ndNodeInfoListFree): Renamed.
+	(ndNodeInfoPrint): Always output each element.
+	(ndNodeInfoListPrint): Added argument fp.
+	(ndLockCtxtPrint): Ditto.
+	(ndHTTPMethod): New function.
+	(nd_dav_request): Added argumnet auth_fn.
+	(nd_dav_request): Use ndHTTPMethod instead of xmlNanoHTTPMethod.
+	(propfind_query): Added argument fn.
+	(ndPropFind): Ditto.
+	(ndPut): Ditto.
+	(ndDelete): Ditto.
+	(nd_lock_request): Ditto.
+	(ndStrdup): Renamed.
+	(ndLock): Ditto.
+	(ndUnlock): Ditto.
+	(ndGet): Ditto.
+
+	* main.c: Rewrite.
+
+	* README.ja: Rewrite.
+
+	* Makefile.am: Added auth.c
+
+	* config.h.in, configure.in, configure, Makefile.in: Re-generated.
+
+	* auth.c: New file.
+
+2002-02-21  Yuuichi Teranishi  <teranisi@gohome.org>
+
+	* nd.c (nd_parse_activelock): Fix scope;
+	Trim whitespaces around token.
+	(nd_strdup): New function.
+	(ndLockCtxtPrint): Fix.
+
+	* main.c: Include config.h; Use HAVE_STRING_H.
+	(main): Fixed GET dumps core.
+
+	* nd.c: Ditto.
+
+	* AUTHORS, ChangeLog, INSTALL, Makefile.in, NEWS, README,
+	aclocal.m4, config.h.in, configure.in, install-sh, missing,
+	mkinstalldirs, stamp-h.in: New files.

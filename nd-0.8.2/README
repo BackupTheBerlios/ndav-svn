@@ -1,0 +1,20 @@
+nd -- Tiny little command line WebDAV interface.
+				 Yuuichi Teranishi <teranisi@gohome.org>
+
+nd provides a simple command line interface to the RFC 2518 (WebDAV) server.
+
+Required environment: libxml2
+
+License: MPL/GPL/LGPL
+
+Install:
+
+% ./configure
+% make
+% su
+# make install
+
+Usage: See the man page.
+
+
+

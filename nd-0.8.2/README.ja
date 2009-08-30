@@ -1,0 +1,19 @@
+nd -- Tiny little command line WebDAV interface.
+				 Yuuichi Teranishi <teranisi@gohome.org>
+
+nd は RFC 2518 の WebDAV サーバへの簡単なコマンドラインインタフェースを
+提供する。
+
+必要な環境: libxml2
+
+ライセンス: MPL/GPL/LGPL
+
+インストール:
+
+% make
+% su
+# make install
+
+使い方: man を御覧ください
+
+

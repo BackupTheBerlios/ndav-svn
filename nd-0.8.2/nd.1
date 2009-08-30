@@ -1,0 +1,172 @@
+.\" Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
+.\"
+.\" Permission is hereby granted, free of charge, to any person obtaining
+.\" a copy of this software and associated documentation files (the
+.\" "Software"), to deal in the Software without restriction, including
+.\" without limitation the rights to use, copy, modify, merge, publish,
+.\" distribute, sublicense, and/or sell copies of the Software, and to
+.\" permit persons to whom the Software is furnished to do so, subject to
+.\" the following conditions:
+.\"
+.\" The above copyright notice and this permission notice shall be
+.\" included in all copies or substantial portions of the Software.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+.\" EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+.\" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+.\" NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+.\" LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+.\" OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+.\" WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+.\"
+.TH ND 1 "Febrary 25, 2002"
+.SH NAME
+nd \- Tiny little command line WebDAV interface
+.\"
+.SH SYNOPSIS
+nd
+.RI [ options ]
+.RI url
+.\"
+.SH DESCRIPTION
+.B nd
+privides a simple command line interface to the RFC 2518 (WebDAV) server. If no option is specifed, HTTP GET command is issued and writes response data to the standard output.
+.PP
+The options are as follows:
+.TP 8
+.BI \-c " dest_url"
+COPY
+.IR url
+to the
+.IR dest_url .
+Use lock token if 
+.B \-t
+is specified. 
+.TP 8
+.BI \-f
+Force override the content even when the MOVE or COPY target already exits.
+.TP 8
+.BI \-v
+View property information of
+.IR url
+by PROPFIND. With 
+.B \-g
+option, only the specified property is displayed.
+.TP 8
+.BI \-p " file"
+PUT
+.IR file
+content to the
+.IR url .
+Use lock token if 
+.B \-t
+is specified.
+.TP 8
+.BI \-g " name"
+Specify the property name for
+.B \-v
+option.
+.TP 8
+.BI \-e " name=value"
+Edit the property with name to value using PROPPATCH .
+.TP 8
+.BI \-N " namespace-url"
+Specify the property namespace URL for 
+.B \-e
+or
+.B \-g
+option.
+.TP 8
+.BI \-P " file"
+POST
+.IR file
+content to the
+.IR url .
+.B \-T
+is used for the Content-Type.
+.TP 8
+.BI \-T " content_type"
+Use
+.IR content_type
+as a Content\-Type field value of the POST request.
+Default is `application/x\-www\-form\-urlencoded'.
+.TP 8
+.BI \-d
+DELETE
+.IR url .
+Use lock token if 
+.B \-t
+is specified. 
+.TP 8
+.BI \-l
+LOCK
+.IR url .
+Use 
+.B \-o
+as owner,
+.B \-s
+as scope,
+.B \-i
+as timeout.
+.TP 8
+.BI \-o " owner"
+Specify lock 
+.IR owner .
+Default is USER environment variable.
+.TP 8
+.BI \-s " scope"
+Specify lock
+.IR scope
+(`exclusive' or `shared'). Default is `exclusive'.
+.TP 8
+.BI \-i " timeout"
+Specify lock 
+.IR timeout
+interval. Default is `Infinite'.
+.TP 8
+.BI \-u
+UNLOCK
+.IR url .
+.BI \-t
+option is required.
+.TP 8
+.BI \-t " token"
+Specify the lock
+.IR token .
+.TP 8
+.BI \-r
+Set command execution `Depth' as `Infinity'.
+.TP 8
+.BI \-a " realm"
+Specify authentication
+.IR realm .
+.TP 8
+.BI \-A " realm"
+Specify proxy authentication
+.IR realm .
+.TP 8
+.BI \-k
+MKCOL
+.IR url
+\.
+.TP 8
+.BI \-m " dest_url"
+MOVE
+.IR url
+to the
+.IR dest_url .
+Use lock token if 
+.B \-t
+is specified. 
+.TP 8
+.BI \-S
+Print output using s\-expression.
+.SH ENVIRONMENT VARIABLES
+.TP 8
+.B http_proxy, HTTP_PROXY
+Specify HTTP proxy.
+.SH AUTHORS
+Yuuichi Teranishi (teranisi@gohome.org).
+.SH SEE ALSO
+.IR libxml (4).
+.\" end of manual page
