@@ -35,7 +35,35 @@
 int format = ND_PRINT_AS_HEADER;
 int debug = 0;
 
-const char optstring[] = "c:de:fg:hi:lm:o:vukrs:t:p:a:A:ST:P:DN:";
+const static char optstring[] = "c:de:fg:hi:lm:o:vukrs:t:p:a:A:ST:P:DN:";
+
+const static struct option long_options[] = {
+	{"copy-to",	required_argument, 0, 'c'},
+	{"put-file",	required_argument, 0, 'p'},
+	{"move",	required_argument, 0, 'm'},
+	{"delete",	no_argument, 0, 'd'},
+	{"get-prop",	required_argument, 0, 'g'},
+	{"edit-prop",	required_argument, 0, 'e'},
+	{"namespace",	required_argument, 0, 'N'},
+	{"post",	required_argument, 0, 'P'},
+	{"content-type",	required_argument, 0, 'T'},
+	{"force",	no_argument, 0, 'f'},
+	{"view",	no_argument, 0, 'v'},
+	{"lock",	no_argument, 0, 'l'},
+	{"unlock",	no_argument, 0, 'u'},
+	{"recursive",	no_argument, 0, 'r'},
+	{"mkcol",	no_argument, 0, 'k'},
+	{"s-expr",	no_argument, 0, 'S'},
+	{"help",	no_argument, 0, 'h'},
+	{"debug",	no_argument, 0, 'D'},
+	{"owner",	required_argument, 0, 'o'},
+	{"scope",	required_argument, 0, 's'},
+	{"timeout",	required_argument, 0, 'i'},
+	{"token",	required_argument, 0, 't'},
+	{"auth",	required_argument, 0, 'a'},
+	{"proxy-auth",	required_argument, 0, 'A'},
+	{0, 0, 0, 0}
+};
 
 void error_exit (int format, const char *fmt, ...) {
 	va_list ap;
@@ -59,62 +87,65 @@ void error_exit (int format, const char *fmt, ...) {
 }; /* error_exit(...) */
 
 #define ND_USAGE "%s version %s\n\
-usage: %s [options] url\n\
-	if no option, GET url.\n\
-	-c dest_url\n\
-		 COPY url to the dest_url. (Not implemented yet)\n\
-	-v\n\
-		 View property information of url by PROPFIND.\n\
-		 With -g option, only the specified property is displayed.\n\
-	-p file\n\
-		 Write file content to the url by PUT.\n\
-		 Use lock token if -t is specified. \n\
-	-g name\n\
-		 Specify the property name for -v option.\n\
-	-e name=value\n\
-		 Edit the property.\n\
-		 The property named 'name' is changed to 'value'.\n\
-		 If multiple '-e' options are specified, only the first one takes\n\
-		 effect.\n\
-		 -N is required if namespace of the property is other than 'DAV:'\n\
-	-N namespace-url\n\
-		 Specify the property namespace URL for -e or -g option.\n\
-	-P file\n\
-		 POST file content to the url. -T is required.\n\
-	-T content_type\n\
-		 Use content_type as a Content-Type of the POST request.\n\
-		 Default is `application/x-www-form-urlencoded'.\n\
-	-d\n\
-		 DELETE url. Use lock token if -t is specified. \n\
-	-l\n\
-		 LOCK url.\n\
-	-k\n\
-		 MKCOL url.\n\
-	-m dest_url\n\
-		 MOVE url to the dest_url. (Not implemented yet)\n\
-	-o owner\n\
-		 Specify lock owner. Default is USER environment variable.\n\
-	-r\n\
-		 Execute operation by setting depth as infinity. (Not implemented yet)\n\
-	-a realm\n\
-		 Specify authentication realm for the request.\n\
-	-A realm\n\
-		 Specify proxy authentication realm for the request.\n\
-	-s scope\n\
-		 Specify lock scope (`exclusive' or `shared'). Default is `exclusive'.\n\
-	-i timeout\n\
-		 Specify lock timeout interval. Default is `Infinite'.\n\
-	-u\n\
-		 UNLOCK url. -t option is required.\n\
-	-t token\n\
-		 Use lock token `token'.\n\
-	-S\n\
-		 Print output by s-expression.\n\
-	-D\n\
-		 Debug mode.\n"
+usage: %s [options] url\n\n\
+	If no option is given, the http-action GET is implied.\n\n\
+	-c|--copy-to <dest_url>\n\
+		COPY url to the dest_url.\n\
+		(Not yet implemented.)\n\
+	-v|--view\n\
+		View property information of url by PROPFIND.\n\
+		With option '-g', only the specified property is displayed.\n\
+	-p|--put-file <file>\n\
+		Write file content to the url by PUT.\n\
+		Use lock token if -t is specified. \n\
+	-g|--get-prop <name>\n\
+		Specify the property name for -v option.\n\
+	-e|--edit-prop <name=value>\n\
+		Edit the property 'name'. Its value is changed to 'value'.\n\
+		When multiple '-e' options are specified, only the first\n\
+		one takes effect.\n\
+		A namespace marker '-N' is required if the namespace of the\n\
+		property is something other than 'DAV:'\n\
+	-N|--namespace <namespace-url>\n\
+		Specify the property namespace URL for -e or -g option.\n\
+	-P|--post <file>\n\
+		POST file content to the url. -T is required.\n\
+	-T|--content-type <content_type>\n\
+		Use content_type as a Content-Type of the POST request.\n\
+		Default is `application/x-www-form-urlencoded'.\n\
+	-d|--delete\n\
+		DELETE url. Use lock token if -t is specified. \n\
+	-l|--lock\n\
+		LOCK url.\n\
+	-k|--mkcol\n\
+		MKCOL url.\n\
+	-m|--move <dest_url>\n\
+		MOVE url to the dest_url. (Not yet implemented.)\n\
+	-o|--owner <owner>\n\
+		Specify lock owner. Default is USER environment variable.\n\
+	-r|--recursive\n\
+		Execute operation by setting depth as infinity.\n\
+		(Not yet implemented.)\n\
+	-a|--auth <realm>\n\
+		Specify authentication realm for the request.\n\
+	-A|--proxy-auth <realm>\n\
+		Specify proxy authentication realm for the request.\n\
+	-s|--scope <scope>\n\
+		Specify lock scope (`exclusive' or `shared'). The default\n\
+		is `exclusive'.\n\
+	-i|--timeout <timeout>\n\
+		Specify lock timeout interval. Default is `Infinite'.\n\
+	-u|--unlock\n\
+		UNLOCK url. -t option is required.\n\
+	-t|--token <token>\n\
+		Use lock token `token'.\n\
+	-S|--s-expr\n\
+		Print output by s-expression.\n\
+	-D|--debug\n\
+		Debug mode.\n"
 
 void usage(char * prog) {
-	fprintf(stderr, ND_USAGE, PACKAGE, VERSION, prog);
+	fprintf(stderr, ND_USAGE, PACKAGE, VERSION, basename(prog));
 }; /* usage(char *) */
 
 void auth_notify(void * ctxt) {
@@ -181,7 +212,8 @@ int main(int argc, char * argv[]) {
 	/* OMIT xml errors. */
 	xmlSetGenericErrorFunc(NULL, null_error_handler);
 
-	while ( (optc = getopt(argc, argv, optstring)) != -1 )
+	while ( (optc = getopt_long(argc, argv, optstring, long_options, NULL))
+			!= -1 )
 	{
 		switch (optc) {
 			case 'c':	mode = 'c';
