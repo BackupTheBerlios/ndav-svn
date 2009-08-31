@@ -222,17 +222,13 @@ int main(int argc, char * argv[]) {
 						break;
 			case 'T':	content_type = optarg;
 						break;
-			case 'N':
-			ns = optarg;
+			case 'N':	ns = optarg;
 						break;
-			case 'u':
-			mode = 'u';
+			case 'u':	mode = 'u';
 						break;
-			case 'k':
-			mode = 'k';
+			case 'k':	mode = 'k';
 						break;
-			case 'r':
-			infinite = 1;
+			case 'r':	infinite = 1;
 						break;
 			case 's':	if (! strcmp("shared", optarg))
 							scope = ND_LOCK_SCOPE_SHARED;
@@ -243,6 +239,7 @@ int main(int argc, char * argv[]) {
 						infile = optarg;
 						break;
 			case 'h':	/* Help and catch-all. */
+			case '?':
 			default:	usage(argv[0]);
 						exit(1);
 						break;
@@ -277,15 +274,22 @@ int main(int argc, char * argv[]) {
 						char *name = edit;
 						char *value = NULL;
 
+						/* Locate the equal sign. */
 						for (value = name;
 								(*value != '\0') && (*value != '=');
 								value++)
 							;
 
-						if ( value != '\0' )
+						/* Now "*value" is either '\0' or '='. */ 
+
+						if ( *value != '\0' )
+							/* Step over the assignment character
+							 * and make sure that "char * name"
+							 * contains only the property name. */
 							*value++ = '\0';
 
 						if ( *value == '\0' )
+							/* An empty value string was submitted. */
 							value = NULL;
 
 						code = ndPropPatch(url, auth, name, value,
@@ -354,14 +358,11 @@ int main(int argc, char * argv[]) {
 						if (token != NULL)
 							error_exit(format, "token is not required");
 
-						if (url[strlen(url) - 1] == '/') {
-
-							if (infinite)
-								depth = ND_DEPTH_INFINITE;
-							else
-								depth = ND_DEPTH_1;
-						} else
-							depth = ND_DEPTH_0;
+						depth = ( url[strlen(url) - 1] == '/' )
+									? ( infinite
+											? ND_DEPTH_INFINITE
+											: ND_DEPTH_1 )
+									: ND_DEPTH_0;
 
 						code = ndPropFind(url, auth, prop, ns, depth, &ret);
 						ndFreeAuthCtxt(auth);
@@ -378,13 +379,11 @@ int main(int argc, char * argv[]) {
 						int code;
 						int depth;
 
-						if ( url[strlen(url) - 1] == '/' ) {
-							if (infinite)
-								depth = ND_DEPTH_INFINITE;
-							else
-								depth = ND_DEPTH_1;
-						} else
-							depth = ND_DEPTH_0;
+						depth = ( url[strlen(url) - 1] == '/' )
+									? ( infinite
+											? ND_DEPTH_INFINITE
+											: ND_DEPTH_1 )
+									: ND_DEPTH_0;
 
 						code = ndLock(url, auth, depth,
 									owner ? owner : getenv ("USER"),
@@ -406,13 +405,11 @@ int main(int argc, char * argv[]) {
 						if (token == NULL)
 							error_exit(format, "token is required");
 		
-						if (url[strlen(url) - 1] == '/') {
-							if (infinite)
-								depth = ND_DEPTH_INFINITE;
-							else
-								depth = ND_DEPTH_0;
-						} else
-							depth = ND_DEPTH_0;
+						depth = ( url[strlen(url) - 1] == '/' )
+									? ( infinite
+											? ND_DEPTH_INFINITE
+											: ND_DEPTH_1 )
+									: ND_DEPTH_0;
 
 						ret = ndUnlock(url, auth, depth, token);
 						ndFreeAuthCtxt(auth);
