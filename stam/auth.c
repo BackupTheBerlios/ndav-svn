@@ -11,9 +11,12 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+
 #ifdef HAVE_STRING_H
+#define _GNU_SOURCE
 #include <string.h>
 #endif /* HAVE_STRING_H */
+
 #include <ctype.h>
 
 #include "nd.h"
@@ -37,69 +40,52 @@ ndAuthParamPtr ndAuthParamCreateDigest();
 xmlBufferPtr ndAuthBasic(ndAuthParamPtr param);
 xmlBufferPtr ndAuthDigest(ndAuthParamPtr param);
 
-struct http_auth www_auth [] =
+struct http_auth www_auth[] =
 {
 		{"Basic",	ndAuthParamCreateBasic, ndAuthBasic},
 		{"Digest",	ndAuthParamCreateDigest, ndAuthDigest},
 		{NULL, NULL}
 };
 
-/* util for convinience */
+/* Shorhand operator to add a singel character. */
 void xmlBufferAddChar(xmlBufferPtr buf, char ch) {
-	char str[2];
-	str [0] = ch;
-	str [1] = '\0';
+	xmlChar str[2];
+	str[0] = ch;
+	str[1] = '\0';
 	xmlBufferAdd(buf, str, 1);
 }
 
-char * nd_extract_auth_val(char **q) {
-		unsigned char *qq = *(unsigned char **)q;
+char * nd_extract_auth_val(xmlChar **q) {
 		int quoted = 0;
+		char * ret;
+		xmlChar * qq = *q;
 		xmlBufferPtr val = xmlBufferCreate();
-		char *ret;
 
 		SKIP_BLANKS(qq);
 		if (*qq == '"') {
 			quoted = 1;
-			xmlBufferAddChar (val, *qq++);
+			xmlBufferAddChar(val, *qq++);
 		}
 
 		while (*qq != '\0') {
 			if (quoted && *qq == '"') {
-				xmlBufferAddChar (val, *qq++);
+				xmlBufferAddChar(val, *qq++);
 				break;
 			}
 			if ( ! quoted) {
-				switch (*qq) {
-					case '(':
-					case ')':
-					case '<':
-					case '>':
-					case '@':
-					case ',':
-					case ';':
-					case ':':
-					case '\\':
-					case '"':
-					case '/':
-					case '?':
-					case '=':
-					case ' ':
-					case '\t':	qq++;
-								goto end_token;
-					default:
-								if (*qq <= 037 || *qq == 177) {
-									qq++;
-									goto end_token;
-
-								}
-				} /* switch */
-			} /* if ( ! quoted ) */
-			else
+				if ( strchr("()<>@,;:\\\"/?= \t", *qq) != NULL ) {
+					q++;
+					goto end_token;
+				} else
+					if ( (*qq < 037) || (*qq == 0177) ) {
+						q++;
+						goto end_token;
+					}
+			} else
 				if (quoted && *qq == '\\')
-					xmlBufferAddChar (val, *qq++);
+					xmlBufferAddChar(val, *qq++);
 
-			xmlBufferAddChar (val, *qq++);
+			xmlBufferAddChar(val, *qq++);
 		}; /* while */
 
  end_token:
@@ -115,7 +101,7 @@ char * nd_extract_auth_val(char **q) {
 		return ret;
 }; /* nd_extract_auth_val(char **) */
 
-ndAuthParamPtr ndAuthParamCreate(struct http_auth * hauth, char * p) {
+ndAuthParamPtr ndAuthParamCreate(struct http_auth * hauth, xmlChar * p) {
 	ndAuthParamPtr param, ap;
 
 	/* Init Param */
@@ -124,7 +110,7 @@ ndAuthParamPtr ndAuthParamCreate(struct http_auth * hauth, char * p) {
 	while (*p != '\0') {
 		SKIP_BLANKS(p);
 		for (ap = param; ap->name != NULL; ap++) {
-			if (strncasecmp(p, ap->name, strlen(ap->name)) == 0) {
+			if (strncasecmp((char *) p, ap->name, strlen(ap->name)) == 0) {
 				p += strlen(ap->name);
 				SKIP_BLANKS(p);
 
@@ -172,7 +158,7 @@ char * ndAuthParamValue(ndAuthParamPtr param, char *name) {
 	ndAuthParamPtr ap;
 
 	for (ap = param; ap->name != NULL; ap++)
-		if (!strcmp (ap->name, name))
+		if (! strcmp(ap->name, name))
 			return ap->val;
 
 	return NULL;
@@ -182,10 +168,10 @@ int ndAuthParamSetValue(ndAuthParamPtr param, char *name, char *val) {
 	ndAuthParamPtr ap;
 
 	for (ap = param; ap->name != NULL; ap++)
-		if (!strcmp (ap->name, name)) {
+		if (! strcmp(ap->name, name)) {
 			if (ap->val != NULL)
-				xmlFree (ap->val);
-			ap->val = xmlMemStrdup (val);
+				xmlFree(ap->val);
+			ap->val = xmlMemStrdup(val);
 			return 0;
 
 		}
@@ -202,7 +188,7 @@ xmlBufferPtr ndAuthEncodeB(char *a) {
 		unsigned char d[3];
 		unsigned char c1, c2, c3, c4;
 		int i, n_pad;
-		xmlBufferPtr w = xmlBufferCreate ();
+		xmlBufferPtr w = xmlBufferCreate();
 
 		while (1) {
 			if (*a == '\0')
@@ -251,9 +237,9 @@ xmlBufferPtr ndAuthEncodeB(char *a) {
 xmlBufferPtr ndAuthBasic(ndAuthParamPtr param) {
 	xmlBufferPtr buf = xmlBufferCreate();
 
-	xmlBufferAdd(buf, ndAuthParamValue(param, "user"), -1);
-	xmlBufferAdd(buf, ":", -1);
-	xmlBufferAdd(buf, ndAuthParamValue(param, "password"), -1);
+	xmlBufferAdd(buf, (xmlChar *) ndAuthParamValue(param, "user"), -1);
+	xmlBufferAdd(buf, (xmlChar *) ":", -1);
+	xmlBufferAdd(buf, (xmlChar *) ndAuthParamValue(param, "password"), -1);
 
 	return ndAuthEncodeB((char *) xmlBufferContent(buf));
 }; /* ndAuthBasic(ndAuthParamPtr) */
@@ -264,14 +250,14 @@ xmlBufferPtr ndAuthDigest(ndAuthParamPtr param) {
 
 int ndAuthCreateHeader(char *str, ndAuthCallback fn,
 						 xmlBufferPtr *buf_return, int is_proxy) {
-	char *p;
-	struct http_auth *ha;
-	struct http_auth *hauth = NULL;
+	xmlChar * p;
+	struct http_auth * ha;
+	struct http_auth * hauth = NULL;
 	ndAuthParamPtr param = NULL;
 
-	p = str;
+	p = (xmlChar *) str;
 	for (ha = &www_auth[0]; ha->name != NULL; ha++) {
-		if (strncasecmp (p, ha->name, strlen(ha->name)) == 0) {
+		if ( strncasecmp((char *) p, ha->name, strlen(ha->name)) == 0 ) {
 			hauth = ha;
 			p += strlen(ha->name);
 			SKIP_BLANKS(p);
@@ -286,15 +272,15 @@ int ndAuthCreateHeader(char *str, ndAuthCallback fn,
 		xmlBufferPtr ret = xmlBufferCreate();
 
 		xmlBufferAdd(ret,
-					is_proxy ? "Proxy-Authorization:"
-							: "Authorization: ",
+					is_proxy ? (xmlChar *) "Proxy-Authorization:"
+							 : (xmlChar *) "Authorization: ",
 					-1);
-		xmlBufferAdd(ret, ndAuthParamValue(param, "name"), -1);
-		xmlBufferAdd(ret, " ", -1);
+		xmlBufferAdd(ret, (xmlChar *) ndAuthParamValue(param, "name"), -1);
+		xmlBufferAdd(ret, (xmlChar *) " ", -1);
 		tmp = hauth->auth_fn(param);
 		ndAuthParamFree(param);
 		xmlBufferAdd(ret, xmlBufferContent(tmp), -1);
-		xmlBufferAdd(ret, "\r\n", -1);
+		xmlBufferAdd(ret, (xmlChar *) "\r\n", -1);
 		*buf_return = ret;
 		return 0;
 	}
