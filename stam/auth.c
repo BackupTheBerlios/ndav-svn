@@ -75,11 +75,11 @@ char * nd_extract_auth_val(xmlChar **q) {
 			if ( ! quoted) {
 				if ( strchr("()<>@,;:\\\"/?= \t", *qq) != NULL ) {
 					q++;
-					goto end_token;
+					break;
 				} else
 					if ( (*qq < 037) || (*qq == 0177) ) {
 						q++;
-						goto end_token;
+						break;
 					}
 			} else
 				if (quoted && *qq == '\\')
@@ -88,8 +88,6 @@ char * nd_extract_auth_val(xmlChar **q) {
 			xmlBufferAddChar(val, *qq++);
 		}; /* while */
 
- end_token:
-		
 		if (*qq != '\0') {
 			SKIP_BLANKS(qq);
 			if (*qq == ',')
