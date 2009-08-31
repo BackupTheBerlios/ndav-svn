@@ -1,0 +1,44 @@
+# Process this file with autoconf to produce a configure script.
+
+AC_INIT(main.c)
+
+PACKAGE=nd
+MAJOR_VERSION=0
+MINOR_VERSION=8
+MICRO_VERSION=2
+INTERFACE_AGE=6
+BINARY_AGE=0
+
+VERSION=$MAJOR_VERSION.$MINOR_VERSION.$MICRO_VERSION
+
+AM_INIT_AUTOMAKE(nd, $VERSION)
+
+AM_CONFIG_HEADER(config.h)
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+
+# Checks for libraries.
+dnl Check libxml2.
+AC_PATH_PROG(XML_CONFIG, xml2-config, no)
+if test "$XML_CONFIG" = "no"; then
+  AC_MSG_ERROR([libxml2 not installed - please install first])
+fi
+CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
+AC_CHECK_HEADERS(parser.h)
+LIBS="$LIBS `$XML_CONFIG --libs`"
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([errno.h fcntl.h stdlib.h string.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+# Checks for library functions.
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp])
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

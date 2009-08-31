@@ -1,0 +1,17 @@
+ndav -- Small command line interface to WebDAV servers.
+
+		Author: 2009 (C) Mats Erik Andersson <mats.andersson@gisladisker.se>
+
+
+Ndav implements command line tool to WebDAV servers, with the aim to
+support the specifications in RFC 2518.
+
+
+This source code is a fork of an original "nd", developped and
+copywrited 2001 -- 2003, by
+
+		2001 - 2003 (C) Yuuichi Teranishi <teranisi@gohome.org>
+		License: MPL/GPL/LGPL
+
+
+Requirement: libxml2
