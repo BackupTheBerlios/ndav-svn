@@ -13,17 +13,21 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "nd.h"
+#include "ndav.h"
 
 #include <stdarg.h>
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif /* HAVE_STRING_H */
 
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif
 
+#ifdef HAVE_GETOPT_H
 #define _GNU_SOURCE
 #include <getopt.h>
+#endif
 
 #include <libxml/parser.h>
 #include <libxml/nanohttp.h>

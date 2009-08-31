@@ -1,6 +1,6 @@
-bin_PROGRAMS=nd
+bin_PROGRAMS=ndav
 
-nd_SOURCES = nd.c auth.c main.c nd.h
-man_MANS = nd.1
+ndav_SOURCES = ndav.c auth.c main.c ndav.h
+man_MANS = ndav.1
 
-EXTRA_DIST = README.ja $(man_MANS)
+EXTRA_DIST = $(man_MANS)

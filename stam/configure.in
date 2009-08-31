@@ -2,16 +2,16 @@
 
 AC_INIT(main.c)
 
-PACKAGE=nd
+PACKAGE=ndav
 MAJOR_VERSION=0
-MINOR_VERSION=8
-MICRO_VERSION=2
-INTERFACE_AGE=6
+MINOR_VERSION=0
+MICRO_VERSION=1
+#INTERFACE_AGE=6
 BINARY_AGE=0
 
 VERSION=$MAJOR_VERSION.$MINOR_VERSION.$MICRO_VERSION
 
-AM_INIT_AUTOMAKE(nd, $VERSION)
+AM_INIT_AUTOMAKE(ndav, $VERSION)
 
 AM_CONFIG_HEADER(config.h)
 
@@ -31,14 +31,14 @@ LIBS="$LIBS `$XML_CONFIG --libs`"
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([errno.h fcntl.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([errno.h fcntl.h stdlib.h string.h unistd.h libgen.h getopt.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp])
+AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp getopt basename])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

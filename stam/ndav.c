@@ -23,7 +23,7 @@
 #include <libxml/parser.h>
 #include <libxml/xmlerror.h>
 
-#include "nd.h"
+#include "ndav.h"
 
 ndNodeInfoPtr
 ndNodeInfoNew ()

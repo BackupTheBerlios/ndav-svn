@@ -19,7 +19,7 @@
 
 #include <ctype.h>
 
-#include "nd.h"
+#include "ndav.h"
 #include <libxml/tree.h>
 
 #define SKIP_BLANKS(p) { while (*(p)&&isspace(*(p))) (p)++; }
