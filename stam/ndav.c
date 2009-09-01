@@ -332,12 +332,12 @@ void * ndHTTPMethod( const char * URL,
 	}
 
 	if (headers)
-		xmlBufferAdd(header_buf, headers, -1);
+		xmlBufferAdd(header_buf, (xmlChar *) headers, -1);
 
 	ctxt = xmlNanoHTTPMethod(URL, method, input, contentType,
 					xmlBufferLength(header_buf) == 0
-								?  NULL
-								: xmlBufferContent(header_buf),
+								? NULL
+								: (char *) xmlBufferContent(header_buf),
 					ilen);
 	xmlBufferFree(header_buf);
 
@@ -362,21 +362,22 @@ void * ndHTTPMethod( const char * URL,
 		if (returnCode == 407) {
 			if (proxy_auth_header)
 				xmlFree(proxy_auth_header);
-			proxy_auth_header = xmlMemStrdup(xmlBufferContent(header_buf));
+			proxy_auth_header =
+				xmlMemStrdup((char *) xmlBufferContent(header_buf));
 			xmlBufferFree(header_buf);
 			header_buf = xmlBufferCreate();
 		}
 	
 		if (headers)
-			xmlBufferAdd(header_buf, headers, -1);
+			xmlBufferAdd(header_buf, (xmlChar *) headers, -1);
 		if (proxy_auth_header)
-			xmlBufferAdd(header_buf, proxy_auth_header, -1);
+			xmlBufferAdd(header_buf, (xmlChar *) proxy_auth_header, -1);
 
 		/* XXX If HTTP/1.1 and Keep-Alive, no need to close here. */
 		xmlNanoHTTPClose(ctxt);
 
 		ctxt = xmlNanoHTTPMethod(URL, method, input, contentType,
-							xmlBufferContent(header_buf), ilen);
+							(char *) xmlBufferContent(header_buf), ilen);
 		xmlBufferFree(header_buf);
 		if (ctxt == NULL)
 			return NULL;
@@ -395,8 +396,8 @@ void * ndHTTPMethod( const char * URL,
 int nd_dav_request( char * method,
 					char * url,
 					ndAuthCtxtPtr auth,
-					char * header,
-					char * content,
+					const char * header,
+					const char * content,
 					int length,
 					xmlBufferPtr * buf_return)
 {
@@ -431,8 +432,8 @@ int nd_dav_request( char * method,
 	if (output == NULL)
 		return -1;
 
-	while ( (len = xmlNanoHTTPRead (ctxt, buffer, sizeof (buffer))) > 0 )
-		xmlBufferAdd (output, buffer, len);
+	while ( (len = xmlNanoHTTPRead(ctxt, buffer,sizeof (buffer))) > 0 )
+		xmlBufferAdd(output, buffer, len);
 
 	xmlNanoHTTPClose(ctxt);
 	*buf_return = output;
@@ -446,7 +447,7 @@ int nd_dav_request( char * method,
 int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
 						 int depth, xmlBufferPtr * buf_return)
 {
-	char * depth_str;
+	char * depth_str = NULL;
 	char depth_header[ND_HEADER_LINE_MAX];
 	const char * verboseQuery =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
@@ -483,7 +484,7 @@ int
 nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 					 char * ns, int depth, xmlBufferPtr * buf_return)
 {
-	char * depth_str;
+	char * depth_str = NULL;
 	char depth_header[ND_HEADER_LINE_MAX];
 	char propfind_request[ND_REQUEST_MAX];
 	const char request_templ[] =	
@@ -516,7 +517,7 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 
 int nd_dav_name_equal(xmlNodePtr node, char * name) {
 	if ( node->ns && node->ns->href
-			&& (! strcmp(node->ns->href, "DAV:")) )
+			&& (! strcmp((char *) node->ns->href, "DAV:")) )
 		return ! strcmp((char *) node->name, name);
 	else
 		return 0;
@@ -627,14 +628,14 @@ void nd_parse_prop(xmlNodePtr cur, ndNodeInfoPtr node) {
 			if (cur->children != NULL)
 				node->restype = xmlMemStrdup((char *) cur->children->name);
 		}
-		else if ( strcmp(cur->name,"text") ) { /* XXX is this true? */
+		else if ( strcmp((char *) cur->name, "text") ) { /* XXX is this true? */
 			ndPropPtr prop;
 			prop = node->props;
 			node->props = ndPropNew();
 			node->props->name = xmlMemStrdup((char *) cur->name);
 			node->props->value = (char *) xmlNodeGetContent(cur);
 			if ( cur->ns && cur->ns->href
-					&& strcmp(cur->ns->href, "DAV:") )
+					&& strcmp((char *) cur->ns->href, "DAV:") )
 				node->props->ns = xmlMemStrdup((char *) cur->ns->href);
 			// ndPropPrint (stderr, node->props, ND_PRINT_AS_SEXP);
 			node->props->next = prop;
@@ -663,19 +664,19 @@ int nd_parse_propstat(xmlNodePtr cur, ndNodeInfoPtr node) {
 				int ret = 0;
 
 				cur += 5;
-				while ( (*cur >= '0') && (*cur <= '9') ) {
+				while ( isdigit(*cur) ) {
 					version *= 10;
 					version += *cur - '0';
 					cur++;
 				}
 				if (*cur == '.') {
 					cur++;
-					if ( (*cur >= '0') && (*cur <= '9') ) {
+					if ( isdigit(*cur) ) {
 						version *= 10;
 						version += *cur - '0';
 						cur++;
 					}
-					while ( (*cur >= '0') && (*cur <= '9') )
+					while ( isdigit(*cur) )
 						cur++;
 				} else
 					version *= 10;
@@ -686,10 +687,10 @@ int nd_parse_propstat(xmlNodePtr cur, ndNodeInfoPtr node) {
 				while ( (*cur == ' ') || (*cur == '\t') )
 					cur++;
 
-				if ( (*cur < '0') || (*cur > '9') )
+				if ( ! isdigit(*cur) )
 					return -1;
 				 
-				while ( (*cur >= '0') && (*cur <= '9') ) {
+				while ( isdigit(*cur) ) {
 					ret *= 10;
 					ret += *cur - '0';
 					cur++;
@@ -755,7 +756,7 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 					int ret = 0;
 
 					cur += 5;
-					while ( (*cur >= '0') && (*cur <= '9') ) {
+					while ( isdigit(*cur) ) {
 						version *= 10;
 						version += *cur - '0';
 						cur++;
@@ -763,12 +764,12 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 
 					if (*cur == '.') {
 						cur++;
-						if ( (*cur >= '0') && (*cur <= '9') ) {
+						if ( isdigit(*cur) ) {
 							version *= 10;
 							version += *cur - '0';
 							cur++;
 						}
-						while ( (*cur >= '0') && (*cur <= '9') )
+						while ( isdigit(*cur) )
 							cur++;
 					} else
 						version *= 10;
@@ -779,10 +780,10 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 					while ( (*cur == ' ') || (*cur == '\t') )
 						cur++;
 
-					if ( (*cur < '0') || (*cur > '9') )
+					if ( ! isdigit(*cur) )
 						return NULL;
 
-					while ( (*cur >= '0') && (*cur <= '9') ) {
+					while ( isdigit(*cur) ) {
 						ret *= 10;
 						ret += *cur - '0';
 						cur++;
@@ -852,7 +853,8 @@ int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
 		return code;
 	
 	// fprintf (stderr, "%s\n", xmlBufferContent(buf));
-	doc = xmlParseMemory(xmlBufferContent(buf), xmlBufferLength(buf));
+	doc = xmlParseMemory((char *) xmlBufferContent(buf),
+							xmlBufferLength(buf));
 	if (doc == NULL) {
 			xmlBufferFree (buf);
 			return -1;
@@ -928,7 +930,8 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		/* Multi status. */
 		if (buf == NULL)
 			return -1;
-		doc = xmlParseMemory(xmlBufferContent(buf), xmlBufferLength(buf));
+		doc = xmlParseMemory((char *) xmlBufferContent(buf),
+								xmlBufferLength(buf));
 		if (doc == NULL) {
 			xmlBufferFree (buf);
 			return -1;
@@ -981,7 +984,8 @@ int ndPut(char * url, ndAuthCtxtPtr auth, char * content, int length,
 		while ( (len = xmlNanoHTTPRead(ctxt, s, sizeof(s))) > 0 )
 			xmlBufferAdd (buf, s, len);
 
-		doc = xmlParseMemory(xmlBufferContent(buf), xmlBufferLength(buf));
+		doc = xmlParseMemory((char *) xmlBufferContent(buf),
+								xmlBufferLength(buf));
 
 		if (doc == NULL) {
 			xmlBufferFree(buf);
@@ -1123,7 +1127,7 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 					char * owner, int scope, char * timeout,
 					xmlBufferPtr * buf_return)
 {
-	char * depth_str;
+	char * depth_str = NULL;
 	char lock_request[ND_REQUEST_MAX];
 	char scope_str[16];
 	char hstr[ND_HEADER_LINE_MAX];
@@ -1187,7 +1191,8 @@ int ndLock(char * url, ndAuthCtxtPtr auth, int depth, char * owner,
 
 	code = nd_lock_request(url, auth, depth, owner, scope, timeout, &buf);
 	if (buf != NULL) {
-		doc = xmlParseMemory(xmlBufferContent(buf), xmlBufferLength(buf));
+		doc = xmlParseMemory((char *) xmlBufferContent(buf),
+								xmlBufferLength(buf));
 		if (doc == NULL) {
 			xmlBufferFree(buf);
 			return -1;
@@ -1206,7 +1211,7 @@ int ndUnlock(char * url, ndAuthCtxtPtr auth, int	depth, char * token)
 {
 	int code;
 	void * ctxt;
-	char * depth_str;
+	char * depth_str = NULL;
 	char hstr[ND_HEADER_LINE_MAX];
 
 	switch (depth) {
