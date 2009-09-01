@@ -1,5 +1,5 @@
 /*
- * auth.c - authentication module for nd.
+ * auth.c - authentication module for ndav.
  *
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.

@@ -1,5 +1,5 @@
 /*
- * nd.h : a small program for WebDAV operations.
+ * ndav.h : a small program for WebDAV operations.
  */
 
 #ifndef _ND_H

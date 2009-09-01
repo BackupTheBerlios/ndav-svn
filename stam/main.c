@@ -1,5 +1,5 @@
 /*
- * main.c - a terminal interface of nd.
+ * main.c - a terminal interface of ndav.
  *
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.
