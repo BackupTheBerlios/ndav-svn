@@ -6,6 +6,8 @@
  *
  * Copyright (C) 2009 Mats Erik Andersson <mats.andersson@gisladisker.se>
  *
+ * $Id$
+ *
  * vim: set ts=4 sw=4:
  */
 

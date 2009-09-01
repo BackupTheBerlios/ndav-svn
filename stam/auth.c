@@ -6,8 +6,11 @@
  *
  * Copyright (C) 2009 Mats Erik Andersson <mats.andersson@gisladisker.se>
  *
+ * $Id$
+ *
  * vim: set ai sw=4 ts=4:
  */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
