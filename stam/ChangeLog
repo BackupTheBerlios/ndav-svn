@@ -1,3 +1,8 @@
+2009-09-08  Mats Erik Andersson <mats.andersson@gisladisker.se>
+
+	* main.c, ndav.c, ndav.h, ndav.1: 
+		An option "--quiet" that minimizes printing to properties only.
+
 2009-08-31  Mats Erik Andersson <mats.andersson@gisladisker.se>
 
 	* Forking of nd-0.8.2.

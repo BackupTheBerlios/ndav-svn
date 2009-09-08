@@ -21,8 +21,15 @@
 #include <stdlib.h>
 #include <libxml/tree.h>
 
-#define ND_PRINT_AS_HEADER	301
-#define ND_PRINT_AS_SEXP	302
+/* Formatting and content extents.
+ * Bit-OR determine outcome. */
+#define ND_PRINT_AS_HEADER	0
+#define ND_PRINT_AS_SEXP	1
+#define ND_PRINT_QUIETLY	4
+#define NDAV_PRINT_HEADER(x)	( ! ((x) & ND_PRINT_AS_SEXP) )
+#define NDAV_PRINT_SEXP(x)		((x) & ND_PRINT_AS_SEXP)
+#define NDAV_PRINT_QUIETLY(x)	((x) & ND_PRINT_QUIETLY)
+#define NDAV_PRINT_VERBOSELY(x)	( ! ((x) & ND_PRINT_QUIETLY) )
 
 #define ND_LOCK_SCOPE_EXCLUSIVE	101
 #define ND_LOCK_SCOPE_SHARED	102

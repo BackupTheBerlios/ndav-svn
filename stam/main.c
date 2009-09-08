@@ -38,10 +38,10 @@
 
 #define RETURNED_AN_ERROR(code)	( ( (code) < 0 ) || ( (code) > 300 ) )
 
-int format = ND_PRINT_AS_HEADER;
-int debug = 0;
+static int format = ND_PRINT_AS_HEADER;
+static int debug = 0;
 
-const static char optstring[] = "c:de:fg:hi:lm:o:vukrs:t:p:a:A:ST:P:DN:";
+const static char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:";
 
 const static struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
@@ -68,6 +68,7 @@ const static struct option long_options[] = {
 	{"token",	required_argument, 0, 't'},
 	{"auth",	required_argument, 0, 'a'},
 	{"proxy-auth",	required_argument, 0, 'A'},
+	{"quiet",	no_argument,	0,	'q'},
 	{0, 0, 0, 0}
 };
 
@@ -76,7 +77,7 @@ void error_exit (int format, const char *fmt, ...) {
 
 	va_start(ap, fmt);
 	if (fmt != NULL) {
-		if (format == ND_PRINT_AS_SEXP) {
+		if ( NDAV_PRINT_SEXP(format) ) {
 			fprintf(stdout, "(error \"");
 			vfprintf(stdout, fmt, ap);
 			fprintf(stdout, "\")\n");
@@ -101,6 +102,8 @@ usage: %s [options] url\n\n\
 	-v|--view\n\
 		View property information of url by PROPFIND.\n\
 		With option '-g', only the specified property is displayed.\n\
+	-q|--quiet\n\
+		Print quietly: only properties, no headers.\n\
 	-p|--put-file <file>\n\
 		Write file content to the url by PUT.\n\
 		Use lock token if -t is specified. \n\
@@ -155,13 +158,13 @@ void usage(char * prog) {
 }; /* usage(char *) */
 
 void auth_notify(void * ctxt) {
-	if (format == ND_PRINT_AS_SEXP) {
+	if ( NDAV_PRINT_SEXP(format) ) {
 
 		int code = xmlNanoHTTPReturnCode(ctxt);
 
 		if ( RETURNED_AN_ERROR(code) )
 			;
-		else
+		else if ( NDAV_PRINT_VERBOSELY(format) )
 			fprintf(stdout, "OK\n");
 	}
 }; /* auth_notify(void *) */
@@ -249,7 +252,9 @@ int main(int argc, char * argv[]) {
 						break;
 			case 'f':	force_overwrite = 1;
 						break;
-			case 'S':	format = ND_PRINT_AS_SEXP;
+			case 'S':	format |= ND_PRINT_AS_SEXP;
+						break;
+			case 'q':	format |= ND_PRINT_QUIETLY;
 						break;
 			case 'a':	auth_realm = optarg;
 						break;

@@ -72,40 +72,44 @@ void ndNodeInfoListFree(ndNodeInfoPtr info) {
 }; /* ndNodeInfoListFree(ndNodeInfoPtr) */
 
 void ndNodeInfoPrint(FILE * fp, ndNodeInfoPtr info, int format) {
-	if (format == ND_PRINT_AS_HEADER) {
+	if ( ! NDAV_PRINT_SEXP(format) ) {
 		if (info == NULL)
 			return;
-		fprintf(fp, "Name: %s\n", info->name ? info->name : "");
-		fprintf(fp, "Status: %d\n", info->status);
-		fprintf(fp, "Last-Modified: %s\n", info->date ? info->date : "");
-		fprintf(fp, "Created: %s\n", info->cdate ? info->cdate : "");
-		fprintf(fp, "Size: %s\n", info->size ? info->size : "");
-		fprintf(fp, "Content-Type: %s\n",
-				info->content ? info->content : "");
-		fprintf(fp, "Resource-Type: %s\n",
-				info->restype ? info->restype : "");
+		if ( NDAV_PRINT_VERBOSELY(format) ) {
+			fprintf(fp, "Name: %s\n", info->name ? info->name : "");
+			fprintf(fp, "Status: %d\n", info->status);
+			fprintf(fp, "Last-Modified: %s\n", info->date ? info->date : "");
+			fprintf(fp, "Created: %s\n", info->cdate ? info->cdate : "");
+			fprintf(fp, "Size: %s\n", info->size ? info->size : "");
+			fprintf(fp, "Content-Type: %s\n",
+					info->content ? info->content : "");
+			fprintf(fp, "Resource-Type: %s\n",
+					info->restype ? info->restype : "");
+		}; /* Print verbosely. */
 		if (info->props)
 			ndPropListPrint(fp, info->props, format);
 		if (info->lock)
 			ndLockInfoListPrint(fp, info->lock, format);
-		fprintf (fp, "\n");
+		//fprintf (fp, "\n");
 	}
-	else if (format == ND_PRINT_AS_SEXP) {
+	else { /* S-expression output. */
 		if (info == NULL)
 			return;
 		fprintf(fp, "(\"%s\"", info->name ? info->name : "");
-		if (info->date)
-			fprintf(fp, " (last-modified \"%s\")", info->date);
-		if (info->cdate)
-			fprintf(fp, " (created \"%s\")", info->cdate);
-		if (info->status)
-			fprintf(fp, " (status %d)", info->status);
-		if (info->size)
-			fprintf(fp, " (size %s)", info->size);
-		if (info->content)
-			fprintf(fp, " (content-type \"%s\")", info->content);
-		if (info->restype)
-			fprintf(fp, " (resourcetype \"%s\")", info->restype);
+		if ( NDAV_PRINT_VERBOSELY(format))  {
+			if (info->date)
+				fprintf(fp, " (last-modified \"%s\")", info->date);
+			if (info->cdate)
+				fprintf(fp, " (created \"%s\")", info->cdate);
+			if (info->status)
+				fprintf(fp, " (status %d)", info->status);
+			if (info->size)
+				fprintf(fp, " (size %s)", info->size);
+			if (info->content)
+				fprintf(fp, " (content-type \"%s\")", info->content);
+			if (info->restype)
+				fprintf(fp, " (resourcetype \"%s\")", info->restype);
+		}; /* Print verbosely. */
 		if (info->props) {
 			fprintf(fp, " ");
 			ndPropListPrint (fp, info->props, format);
@@ -121,17 +125,17 @@ void ndNodeInfoPrint(FILE * fp, ndNodeInfoPtr info, int format) {
 void ndNodeInfoListPrint(FILE * fp, ndNodeInfoPtr info, int format) {
 	ndNodeInfoPtr cur = info;
 
-	if (format == ND_PRINT_AS_SEXP)
+	if ( NDAV_PRINT_SEXP(format) )
 		fprintf(fp, "(");
 
 	while (cur != NULL) {
 		info = info->next;
 		ndNodeInfoPrint(fp, cur, format);
 		cur = info;
-		if (format == ND_PRINT_AS_SEXP && cur != NULL)
+		if ( NDAV_PRINT_SEXP(format) && cur != NULL)
 			fprintf(fp, " ");
 	}
-	if (format == ND_PRINT_AS_SEXP)
+	if ( NDAV_PRINT_SEXP(format) )
 		fprintf(fp, ")\n");
 }/* ndNodeInfoListPrint(FILE *, ndNodeInfoPtr, int) */
 
@@ -170,7 +174,7 @@ void ndLockInfoListFree(ndLockInfoPtr info) {
 }; /* ndLockInfoListFree(ndLockInfoPtr) */
 
 void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
-	if (format == ND_PRINT_AS_HEADER) {
+	if ( NDAV_PRINT_HEADER(format) ) {
 		if (lock == NULL)
 			return;
 		fprintf(fp, "Lock: ");
@@ -183,7 +187,7 @@ void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
 		fprintf(fp, "      timeout=\"%s\"\n",
 				lock->timeout ? lock->timeout : "");
 	}
-	else if (format == ND_PRINT_AS_SEXP) {
+	else if ( NDAV_PRINT_SEXP(format) ) {
 		fprintf(fp, "(lock");
 		if (lock->token)
 			fprintf(fp, " (token \"%s\")", lock->token);
@@ -198,16 +202,16 @@ void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
 void ndLockInfoListPrint(FILE * fp, ndLockInfoPtr info, int format) {
 	ndLockInfoPtr cur = info;
 
-	if (format == ND_PRINT_AS_SEXP)
+	if ( NDAV_PRINT_SEXP(format) )
 		fprintf(fp, "(lock-list ");
 	while (cur != NULL) {
 			info = info->next;
 			ndLockInfoPrint(fp, cur, format);
 			cur = info;
-			if (format == ND_PRINT_AS_SEXP && cur != NULL)
+			if ( ( NDAV_PRINT_SEXP(format) ) && cur != NULL)
 				fprintf(fp, " ");
 	}
-	if (format == ND_PRINT_AS_SEXP)
+	if ( NDAV_PRINT_SEXP(format) )
 		fprintf(fp, ")\n");
 } /* ndLockInfoListPrint(FILE *, ndLockInfoPtr, int) */
 
@@ -243,21 +247,22 @@ void ndPropListFree(ndPropPtr prop) {
 }; /* ndPropListFree(ndPropPtr) */
 
 void ndPropPrint(FILE * fp, ndPropPtr prop, int format) {
-	if (format == ND_PRINT_AS_HEADER) {
+	if ( NDAV_PRINT_HEADER(format) ) {
 		if (prop == NULL)
 				return;
 		if (prop->name) {
+			if ( NDAV_PRINT_VERBOSELY(format) )
+				fprintf(fp, "Property: ");
 			if (prop->value && *prop->value == '\"')
-				fprintf(fp, "Property: %s=%s", prop->name, prop->value);
+				fprintf(fp, "%s=%s", prop->name, prop->value);
 			else if (prop->value)
-				fprintf(fp, "Property: %s=\"%s\"",
-							prop->name, prop->value);
+				fprintf(fp, "%s=\"%s\"", prop->name, prop->value);
 		}
 		if (prop->ns)
 			fprintf (fp, "; ns=\"%s\"\n", prop->ns);
 		else
 			fprintf(fp, "\n");
-	} else if (format == ND_PRINT_AS_SEXP) {
+	} else if ( NDAV_PRINT_SEXP(format) ) {
 		fprintf(fp, "(property");
 		fprintf(fp, " (name \"%s\")", prop->name ? prop->name : "");
 		if (prop->value && *prop->value == '\"')
@@ -278,7 +283,7 @@ void ndPropListPrint(FILE * fp, ndPropPtr prop, int format) {
 		prop = prop->next;
 		ndPropPrint(fp, cur, format);
 		cur = prop;
-		if (format == ND_PRINT_AS_SEXP && cur != NULL)
+		if ( ( NDAV_PRINT_SEXP(format) ) && cur != NULL)
 			fprintf(fp, " ");
 	}
 }; /* ndPropListPrint(FILE *, ndPropPtr, int) */
@@ -637,7 +642,7 @@ void nd_parse_prop(xmlNodePtr cur, ndNodeInfoPtr node) {
 			if ( cur->ns && cur->ns->href
 					&& strcmp((char *) cur->ns->href, "DAV:") )
 				node->props->ns = xmlMemStrdup((char *) cur->ns->href);
-			// ndPropPrint (stderr, node->props, ND_PRINT_AS_SEXP);
+			// ndPropPrint (stderr, node->props, format | ND_PRINT_AS_SEXP);
 			node->props->next = prop;
 		}
 		cur = cur->next;
