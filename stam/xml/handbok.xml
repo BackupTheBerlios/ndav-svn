@@ -79,14 +79,14 @@
 				<title>Beskrivning</title>
 				<para>
 					<command>&prognamn;</command> är ett verktyg för att
-					ställa frågor till en webdav-tjänst, liksom att låta
-					utföra önskade uppdrag såsom uppladdning, flyttning
-					och egenskapsförändringar. Allt en webdav-tjänst
-					skall erbjuda.
+					ställa frågor till en webdav-tjänst, liksom för att
+					låta utföra önskade åtgärder såsom upplägg, omflyttning
+					och egenskapsförändringar. Allt det en webdav-tjänst
+					skall kunna erbjuda.
 				</para>
 				<para>
 					Utan programväxlar är den förvalda åtgärden att
-					hämta det uppgivna målet, en enkel GET-förfrågan.
+					hämta det uppgivna målet, en rättfram GET-förfrågan.
 				</para>
 				<para>
 					Avsikten är att hela Webdav-standarden, RFC 2518,
@@ -108,30 +108,373 @@
 					</varlistentry>
 					<varlistentry>
 						<term>
-							<option>-n</option> | <option>--nocts</option>
+							<option>-c</option> | <option>--copy-to</option>
+							<replaceable
+								class="option">mål-url</replaceable>
 						</term>
 						<listitem>
-							<para>Hindrar</para>
+							<para>
+								Utför en COPY-åtgärd med det uppgivna
+								målet <replaceable
+									class="option">mål-url</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-P</option> | <option>--post</option>
+							<replaceable class="option">fil</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Källan <replaceable
+									class="option">fil</replaceable>
+								kopieras till <replaceable
+									class="option">url</replaceable>
+								medelst en POST-åtgärd.
+								Programväxeln <option>-T</option> kan
+								nyttjas för att angiva innehållets slag.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-p</option> | <option>--put</option>
+							<replaceable class="option">fil</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Källan <replaceable
+									class="option">file</replaceable>
+								kopieras till <replaceable
+									class="option">url</replaceable>
+								medelst en PUT-åtgärd. En låsningsmarkör
+								kan sättas med hjälp av
+								programväxeln <option>-t</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-m</option> | <option>--move-url</option>
+							<replaceable class="option">mål-url</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Källan <replaceable
+									class="option">dest-url</replaceable>
+								flyttas till <replaceable
+									class="option">url</replaceable>
+								medelst en MOVE-åtgärd.
+								En låsningsmarkör kan sättas med hjälp av
+								programväxeln <option>-t</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-d</option> | <option>--delete</option>
+						</term>
+						<listitem>
+							<para>
+								Tag bort målet <replaceable
+									class="option">url</replaceable>
+								genom att sända en DELETE-begäran.
+								En låsningsmarkör kan sättas med hjälp av
+								programväxeln <option>-t</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-l</option> | <option>--lock</option>
+						</term>
+						<listitem>
+							<para>
+								Ett åtkomstlås sättes på målet <replaceable
+									class="option">url</replaceable>
+								med hjälpav en LOCK-begäran.
+								Programväxlarna <option>-i</option>,
+								<option>-o</option> och
+								<option>-s</option> kommer tillsammans
+								att beskriva låsningens egenskaper.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-o</option> | <option>--owner</option>
+							<replaceable class="option">namn</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Bestämmer låsningens ägare till att
+								vara <replaceable
+									class="option">namn</replaceable>.
+								Det förvalda ägarnamnet hämtas från
+								miljövariabeln USER.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-s</option> | <option>--scope</option>
+							<replaceable class="option">omfång</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Bestämmer låsningens räckvidd till
+								att vara <replaceable
+									class="option">omfång</replaceable>.
+								De möjliga värdena är "shared" och
+								"exclusive". Det senare värdet är förvalt.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-i</option> | <option>--timeout</option>
+							<replaceable class="option">tidsrymd</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Sätter låsningens giltighetstid
+								till <replaceable
+									class="option">tidsrymd</replaceable>.
+								Förvalt är "Infinite".
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-t</option> | <option>--token</option>
+							<replaceable class="option">nyckel</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Sätter låsningens öppningsnyckel till
+								strängen <replaceable
+									class="option">nyckel</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-e</option> | <option>--edit-prop</option>
+							<replaceable class="option">namn=värde</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Skriv om egenskapen <replaceable
+									class="option">name</replaceable>
+								för målet <replaceable
+									class="option">url</replaceable>,
+								och tilldela detta värdet <replaceable
+									class="option">värde</replaceable>.
+								Detta verkställes av en PROPPATCH-åtgärd.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-k</option> | <option>--mkcol</option>
+						</term>
+						<listitem>
+							<para>
+								Skapar målet <replaceable
+									class="option">url</replaceable>
+								med hjälp av en MKCOL-begäran.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-N</option> | <option>--namespace</option>
+							<replaceable class="option">sträng</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Bestämmer att <replaceable
+									class="option">namespace-url</replaceable>
+								skall nyttjas som namnområde när
+								filegenskaper ändras med endera av
+								programväxlarna <option>-e</option>
+								eller <option>-g</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-T</option> | <option>--content-type</option>
+							<replaceable class="option">sträng</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Angiver värdet <replaceable
+									class="option">sträng</replaceable>
+								på Content-Type-märket när en
+								POST-åtgärd utföres.
+								Den förvalda MIME-klassen är
+								"application/x-www-form-urlencoded".
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-u</option> | <option>--unlock</option>
+						</term>
+						<listitem>
+							<para>
+								Frisätt målet <replaceable
+									class="option">url</replaceable>
+								med en UNLOCK-begäran.
+								Programväxeln <option>-t</option>
+								måste skickas med i anropet.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-v</option> | <option>--view</option>
+						</term>
+						<listitem>
+							<para>
+								Hämta information om målet
+								<replaceable
+									class="option">url</replaceable>
+								med hjälp av en PROPFIND-begäran.
+								Tillsammans med programväxeln
+								<option>-g</option> kommer en avgränsad
+								egenskapsmängd att inhämtas.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-f</option> | <option>--force</option>
+						</term>
+						<listitem>
+							<para>
+								Framtvingar utförande av åtgärderna
+								MOVE och COPY, även om målet redan
+								skulle finnas till.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-g</option> | <option>--get-prop</option>
+							<replaceable class="option">namn</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Angiv att en egenskapsförfrågan
+								skall avgränsas till att handla
+								om egenskapen <replaceable
+									class="option">namn</replaceable>.
+								Detta inverkar på visningen med
+								programväxeln <option>-v</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-r</option> | <option>--recursive</option>
+						</term>
+						<listitem>
+							<para>
+								Sätt bearbetningsdjupet till "Infinity".
+								Detta innebär en rekursiv genomsökning
+								av målet.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-a</option> | <option>--auth</option>
+							<replaceable class="option">namn</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Uppgiv att autentifiering skall ske
+								för <replaceable
+									class="option">namn</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-A</option> | <option>--proxy-auth</option>
+							<replaceable class="option">namn</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Uppgiv att förmedlingidentiteten är
+								<replaceable
+									class="option">namn</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-S</option> | <option>--s-expr</option>
+						</term>
+						<listitem>
+							<para>
+								Utskrift sker i form av s-uttryck.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-q</option> | <option>--quiet</option>
+						</term>
+						<listitem>
+							<para>
+								Åstadkom en sparsmakad utskrift, i den 
+								mening att endast efterfrågade
+								egenskaper skall skrivas ut och inga
+								namnrubriker.
+							</para>
 						</listitem>
 					</varlistentry>
 				</variablelist>
 			</refsect1>
 			<refsect1>
-				<title>Tangentstyrning</title>
-				<para>
-					nyttjas av <command>&prognamn;</command>:
-				</para>
+				<title>Omgivningsvariabler</title>
 				<variablelist>
 					<varlistentry>
-						<term>~.</term>
-						<term>~x</term>
-					<listitem>
-						<para>
-							Avslutar programmet.
-						</para>
-					</listitem>
+						<term>
+							http_proxy, HTTP_PROXY.
+						</term>
+						<listitem>
+							<para>
+								Bestämmer förmedlingstjänst för http-trafik.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							USER
+						</term>
+						<listitem>
+							<para>
+								Det ägarnamn under vilket alla åtgärder
+								skall komma att uthandlas med
+								webdav-tjänsten.
+							</para>
+						</listitem>
 					</varlistentry>
 				</variablelist>
+			</refsect1>
+			<refsect1>
+				<title>Se även</title>
+				<para>
+					<citerefentry>
+						<refentrytitle>libxml</refentrytitle>
+						<manvolnum>3</manvolnum>
+					</citerefentry>
+				</para>
 			</refsect1>
 			<refsect1>
 				<title>Upphovsman</title>
@@ -583,7 +926,7 @@
 				<para>
 					<citerefentry>
 						<refentrytitle>libxml</refentrytitle>
-						<manvolnum>4</manvolnum>
+						<manvolnum>3</manvolnum>
 					</citerefentry>
 				</para>
 			</refsect1>
