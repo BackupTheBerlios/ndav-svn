@@ -10,6 +10,12 @@ OS = $(shell uname -s)
 ifeq ("$(OS)", "Linux")
 DBK = /usr/share/xml/docbook/stylesheet/nwalsh
 endif
+ifeq ("$(OS)", "FreeBSD")
+DBK = /usr/local/share/xsl/docbook
+endif
+ifeq ("$(OS)", "OpenBSD")
+DBK = /usr/local/share/xsl/docbook
+endif
 
 KODNING = ISO-8859-1
 
