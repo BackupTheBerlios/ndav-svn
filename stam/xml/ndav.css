@@ -1,0 +1,7 @@
+div.reference > div.titlepage {
+	text-align: center;
+}
+
+div.titlepage h1.title {
+	color: blue;
+}

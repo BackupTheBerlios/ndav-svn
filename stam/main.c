@@ -45,7 +45,7 @@ const static char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:";
 
 const static struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
-	{"put-file",	required_argument, 0, 'p'},
+	{"put",		required_argument, 0, 'p'},
 	{"move",	required_argument, 0, 'm'},
 	{"delete",	no_argument, 0, 'd'},
 	{"get-prop",	required_argument, 0, 'g'},

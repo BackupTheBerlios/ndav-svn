@@ -1,0 +1,601 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!--
+#	vim:set sw=4 ts=4 nocin ai:
+-->
+
+<!DOCTYPE part PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+			"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+	<!ENTITY fnamn		"<firstname>Mats Erik</firstname>">
+	<!ENTITY enamn		"<surname>Andersson</surname>">
+	<!ENTITY datum-en	"<date>September 11th, 2009</date>">
+	<!ENTITY datum-sv	"<date>11:e september 2009</date>">
+	<!ENTITY epost		"<email>mats.andersson@gisladisker.se</email>">
+	<!ENTITY namn		"Mats Erik Andersson">
+
+	<!ENTITY paket		"Ndav">
+	<!ENTITY version	"__version__">
+	<!ENTITY prognamn	"ndav">
+	<!ENTITY handbok	"<refentrytitle>&prognamn;</refentrytitle>">
+
+	<!ENTITY debian		"<productname>Debian GNU/Linux</productname>">
+	<!ENTITY eupl		"<acronym>EUPL v1.1</acronym>">
+]>
+
+<part lang="sv">
+	<title>&paket;</title>
+	<!--
+		Handbok: svensk.
+	-->
+	<reference id="referens.sv" lang="sv">
+		<title>Handbok för &paket;.</title>
+		<!--
+		Manualsida svensk: namn.1
+		-->
+		<refentry lang="sv" id="&prognamn;.sv">
+			<refentryinfo>
+				<address>&epost;</address>
+				<author>
+					&fnamn;
+					&enamn;
+				</author>
+				<copyright>
+					<year>2009</year>
+					<holder>&namn;</holder>
+				</copyright>
+				&datum-sv;
+			</refentryinfo>
+			<refmeta>
+				&handbok;
+				<manvolnum>sv.1</manvolnum>
+				<refmiscinfo class="source">&paket;</refmiscinfo>
+				<refmiscinfo class="version">&version;</refmiscinfo>
+			</refmeta>
+			<refnamediv>
+				<refname>&prognamn;</refname>
+				<refpurpose>
+					Litet kommandoradsverktyg mot WebDAV.
+				</refpurpose>
+			</refnamediv>
+			<refsynopsisdiv>
+				<cmdsynopsis>
+					<command>&prognamn;</command>
+					<group choice="opt">
+						<arg choice="plain"><option>options</option></arg>
+					</group>
+					<arg choice="req">
+						<replaceable>url</replaceable>
+					</arg>
+				</cmdsynopsis>
+				<cmdsynopsis>
+					<command>&prognamn;</command>
+					<group choice="req">
+						<arg choice="plain"><option>-h</option></arg>
+						<arg choice="plain"><option>--help</option></arg>
+					</group>
+				</cmdsynopsis>
+			</refsynopsisdiv>
+			<refsect1>
+				<title>Beskrivning</title>
+				<para>
+					<command>&prognamn;</command> är ett verktyg för att
+					ställa frågor till en webdav-tjänst, liksom att låta
+					utföra önskade uppdrag såsom uppladdning, flyttning
+					och egenskapsförändringar. Allt en webdav-tjänst
+					skall erbjuda.
+				</para>
+				<para>
+					Utan programväxlar är den förvalda åtgärden att
+					hämta det uppgivna målet, en enkel GET-förfrågan.
+				</para>
+				<para>
+					Avsikten är att hela Webdav-standarden, RFC 2518,
+					skall uppfyllas av detta verktyg.
+				</para>
+			</refsect1>
+			<refsect1>
+				<title>Programväxlar</title>
+				<variablelist>
+					<varlistentry>
+						<term>
+							<option>-h</option> | <option>--help</option>
+						</term>
+						<listitem>
+							<para>
+								Sammanfatting av möjlig användning.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-n</option> | <option>--nocts</option>
+						</term>
+						<listitem>
+							<para>Hindrar</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect1>
+			<refsect1>
+				<title>Tangentstyrning</title>
+				<para>
+					nyttjas av <command>&prognamn;</command>:
+				</para>
+				<variablelist>
+					<varlistentry>
+						<term>~.</term>
+						<term>~x</term>
+					<listitem>
+						<para>
+							Avslutar programmet.
+						</para>
+					</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect1>
+			<refsect1>
+				<title>Upphovsman</title>
+				<para>
+					Texten har skrivits av &namn; för &debian;, men må
+					fritt nyttjas för andra ändamål. Mångfaldigande,
+					utgivning och ändring av detta dokument må göras
+					under European Union Public License, version 1.1.
+				</para>
+			</refsect1>
+		</refentry>
+	</reference>
+	<!--
+		Handbok: engelsk.
+	-->
+	<reference id="reference.en" lang="en">
+		<title>Manuals for the services in &paket;.</title>
+		<!--
+		Manualsida engelsk: namn.1
+		-->
+		<refentry id="&prognamn;.en">
+			<refentryinfo>
+				<address>
+					&epost;
+				</address>
+				<author>
+					&fnamn;
+					&enamn;
+				</author>
+				<copyright>
+					<year>2009</year>
+					<holder>&namn;</holder>
+				</copyright>
+				&datum-en;
+			</refentryinfo>
+			<refmeta>
+				&handbok;
+				<manvolnum>1</manvolnum>
+				<refmiscinfo class="source">&paket;</refmiscinfo>
+				<refmiscinfo class="version">&version;</refmiscinfo>
+			</refmeta>
+			<refnamediv>
+				<refname>&prognamn;</refname>
+				<refpurpose>
+					Small command line interface to WebDAV servers.
+				</refpurpose>
+			</refnamediv>
+			<refsynopsisdiv>
+				<cmdsynopsis>
+					<command>&prognamn;</command>
+					<group choice="opt">
+						<arg choice="plain"><option>options</option></arg>
+					</group>
+					<arg choice="req">
+						<replaceable>url</replaceable>
+					</arg>
+				</cmdsynopsis>
+				<cmdsynopsis>
+					<command>&prognamn;</command>
+					<group choice="req">
+						<arg choice="plain"><option>-h</option></arg>
+						<arg choice="plain"><option>--help</option></arg>
+					</group>
+				</cmdsynopsis>
+			</refsynopsisdiv>
+			<refsect1>
+				<title>Description</title>
+				<para>
+					<command>&prognamn;</command> is a command line
+					utility to communicate with a WebDAV-server. This
+					tools enables the user to perform all actions the
+					server supports, actions that are described in the
+					protocol standard.
+				</para>
+				<para>
+					In the absence of options, the default action
+					is to send a GET-request for the specified url-target.
+				</para>
+				<para>
+					This utility intends to implement the complete
+					WebDAV standard as expressed in RFC 2518.
+				</para>
+			</refsect1>
+			<refsect1>
+				<title>Options</title>
+				<variablelist>
+					<varlistentry>
+						<term>
+							<option>-h</option> | <option>--help</option>
+						</term>
+						<listitem>
+							<para>
+								Shows a summary of available options.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-c</option> | <option>--copy-to</option>
+							<replaceable
+								class="option">dest-url</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Perform a COPY-request with the specified
+								destination <replaceable
+									class="option">dest-url</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-P</option> | <option>--post</option>
+							<replaceable class="option">file</replaceable>
+						</term>
+						<listitem>
+							<para>
+								The source <replaceable
+									class="option">file</replaceable>
+								is copied to <replaceable
+									class="option">url</replaceable>
+								using a POST-request.
+								The switch <option>-T</option> is
+								used to specify content type.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-p</option> | <option>--put</option>
+							<replaceable class="option">file</replaceable>
+						</term>
+						<listitem>
+							<para>
+								The source <replaceable
+									class="option">file</replaceable>
+								is copied to <replaceable
+									class="option">url</replaceable>
+								using a PUT-request. If so desired,
+								the switch <option>-t</option> activates
+								a lock token.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-m</option> | <option>--move-url</option>
+							<replaceable class="option">dest-url</replaceable>
+						</term>
+						<listitem>
+							<para>
+								The source <replaceable
+									class="option">dest-url</replaceable>
+								is moved to <replaceable
+									class="option">url</replaceable>
+								using a MOVE-request. If so desired,
+								the switch <option>-t</option> activates
+								a lock token.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-d</option> | <option>--delete</option>
+						</term>
+						<listitem>
+							<para>
+								Delete the target <replaceable
+									class="option">url</replaceable>
+								by sending a DELETE-request. If so desired,
+								the switch <option>-t</option> activates
+								a lock token.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-l</option> | <option>--lock</option>
+						</term>
+						<listitem>
+							<para>
+								Lock down the access to <replaceable
+									class="option">url</replaceable>
+								by sending a LOCK-request.
+								The switches <option>-i</option>,
+								<option>-o</option>, and
+								<option>-s</option>, together specify
+								the properties of this lock.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-o</option> | <option>--owner</option>
+							<replaceable class="option">name</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the lock owner as <replaceable
+									class="option">name</replaceable>.
+								The default owner is taken from the
+								shell environment variable USER.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-s</option> | <option>--scope</option>
+							<replaceable class="option">extent</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the locking scope as <replaceable
+									class="option">extent</replaceable>.
+								Possible values are "shared" and
+								"exclusive". The latter of these is the
+								default choice.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-i</option> | <option>--timeout</option>
+							<replaceable class="option">time</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the locking timeout as <replaceable
+									class="option">time</replaceable>.
+								The default value is "Infinite".
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-t</option> | <option>--token</option>
+							<replaceable class="option">string</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the lock token as <replaceable
+									class="option">string</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-e</option> | <option>--edit-prop</option>
+							<replaceable class="option">name=value</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Edit the named property <replaceable
+									class="option">name</replaceable>
+								of <replaceable
+									class="option">url</replaceable>,
+								and assign <replaceable
+									class="option">value</replaceable>
+								to it. This is done using a
+								PROPPATCH-request.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-k</option> | <option>--mkcol</option>
+						</term>
+						<listitem>
+							<para>
+								Creates the target <replaceable
+									class="option">url</replaceable>
+								using a MKCOL-request.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-N</option> | <option>--namespace</option>
+							<replaceable class="option">namespace-url</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify <replaceable
+									class="option">namespace-url</replaceable>
+								to be used as namespace when manipulating
+								properties with either of the options
+								<option>-e</option> or <option>-g</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-T</option> | <option>--content-type</option>
+							<replaceable class="option">content</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify <replaceable
+									class="option">content</replaceable>
+								as the Content-Type-string to be committed
+								in a POST-request. The default MIME-type is
+								"application/x-www-form-urlencoded".
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-u</option> | <option>--unlock</option>
+						</term>
+						<listitem>
+							<para>
+								Unlocks the target <replaceable
+									class="option">url</replaceable>
+								using an UNLOCK-request. The token switch
+								<option>-t</option> is mandatory.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-v</option> | <option>--view</option>
+						</term>
+						<listitem>
+							<para>
+								Retreive property information for
+								<replaceable
+									class="option">url</replaceable>
+								by issuing a PROPFIND-request.
+								When used with the switch
+								<option>-g</option>, a restricted
+								property set is retreived.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-f</option> | <option>--force</option>
+						</term>
+						<listitem>
+							<para>
+								Enforces an override for the requests
+								MOVE and COPY, even if the target already
+								exists.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-g</option> | <option>--get-prop</option>
+							<replaceable class="option">name</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the named property <replaceable
+									class="option">name</replaceable>
+								in a PROPFIND-request. This option
+								restricts the outcome of 
+								the view-switch <option>-v</option>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-r</option> | <option>--recursive</option>
+						</term>
+						<listitem>
+							<para>
+								Set the execution depth to "Infinity",
+								meaning infinite descent into the file tree.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-a</option> | <option>--auth</option>
+							<replaceable class="option">realm</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify authentication scope as <replaceable
+									class="option">realm</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-A</option> | <option>--proxy-auth</option>
+							<replaceable class="option">realm</replaceable>
+						</term>
+						<listitem>
+							<para>
+								Specify the proxy authentication
+								scope as <replaceable
+									class="option">realm</replaceable>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-S</option> | <option>--s-expr</option>
+						</term>
+						<listitem>
+							<para>
+								Prints output using s-expressions.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-q</option> | <option>--quiet</option>
+						</term>
+						<listitem>
+							<para>
+								Print quietly, meaning that only properties
+								are printed, not headers.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect1>
+			<refsect1>
+				<title>Environment variables</title>
+				<variablelist>
+					<varlistentry>
+						<term>
+							http_proxy, HTTP_PROXY.
+						</term>
+						<listitem>
+							<para>
+								Specifies a proxy server for HTTP-traffic.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							USER
+						</term>
+						<listitem>
+							<para>
+								The value of owner to present to the
+								WebDAV-server.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</refsect1>
+			<refsect1>
+				<title>See also</title>
+				<para>
+					<citerefentry>
+						<refentrytitle>libxml</refentrytitle>
+						<manvolnum>4</manvolnum>
+					</citerefentry>
+				</para>
+			</refsect1>
+			<refsect1>
+				<title>Author</title>
+				<para>
+					This text was written by &namn; for the &debian; system,
+					but may be used by others. Permission is granted to
+					copy, distribute and/or modify this document under the
+					terms of the European Union Public License, Version 1.1.
+				</para>
+			</refsect1>
+		</refentry>
+	</reference>
+</part>
