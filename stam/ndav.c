@@ -57,7 +57,7 @@ void ndNodeInfoFree(ndNodeInfoPtr info) {
 	if (info->props)
 		ndPropListFree(info->props);
 	if (info->lock)
-		ndLockInfoListFree (info->lock);
+		ndLockInfoListFree(info->lock);
 	xmlFree(info);
 }
 
@@ -90,7 +90,7 @@ void ndNodeInfoPrint(FILE * fp, ndNodeInfoPtr info, int format) {
 			ndPropListPrint(fp, info->props, format);
 		if (info->lock)
 			ndLockInfoListPrint(fp, info->lock, format);
-		//fprintf (fp, "\n");
+		//fprintf(fp, "\n");
 	}
 	else { /* S-expression output. */
 		if (info == NULL)
@@ -112,7 +112,7 @@ void ndNodeInfoPrint(FILE * fp, ndNodeInfoPtr info, int format) {
 		}; /* Print verbosely. */
 		if (info->props) {
 			fprintf(fp, " ");
-			ndPropListPrint (fp, info->props, format);
+			ndPropListPrint(fp, info->props, format);
 		}
 		if (info->lock) {
 			fprintf(fp, " ");
@@ -160,7 +160,7 @@ void ndLockInfoFree(ndLockInfoPtr lock) {
 		xmlFree(lock->token);
 	if (lock->timeout)
 		xmlFree(lock->timeout);
-	xmlFree (lock);
+	xmlFree(lock);
 }; /* ndLockInfoFree(ndLockInfoPtr) */
 
 void ndLockInfoListFree(ndLockInfoPtr info) {
@@ -177,15 +177,20 @@ void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
 	if ( NDAV_PRINT_HEADER(format) ) {
 		if (lock == NULL)
 			return;
-		fprintf(fp, "Lock: ");
-		if (lock->token)
-			fprintf(fp, "token=\"%s\",\n", lock->token);
-		fprintf(fp, "      scope=\"%s\",\n",
-				lock->scope ? lock->scope : "");
-		fprintf(fp, "      owner-href=\"%s\",\n",
-				 lock->owner_href ? lock->owner_href : "");
-		fprintf(fp, "      timeout=\"%s\"\n",
-				lock->timeout ? lock->timeout : "");
+		if ( NDAV_PRINT_QUIETLY(format) ) {
+			if (lock->token)
+				fprintf(fp, "token=\"%s\"\n", lock->token);
+		} else {
+			fprintf(fp, "Lock: ");
+			if (lock->token)
+				fprintf(fp, "token=\"%s\",\n", lock->token);
+			fprintf(fp, "      scope=\"%s\",\n",
+					lock->scope ? lock->scope : "");
+			fprintf(fp, "      owner-href=\"%s\",\n",
+					 lock->owner_href ? lock->owner_href : "");
+			fprintf(fp, "      timeout=\"%s\"\n",
+					lock->timeout ? lock->timeout : "");
+		}
 	}
 	else if ( NDAV_PRINT_SEXP(format) ) {
 		fprintf(fp, "(lock");
@@ -233,7 +238,7 @@ void ndPropFree(ndPropPtr prop)
 		xmlFree(prop->value);
 	if (prop->ns)
 		xmlFree(prop->ns);
-	xmlFree (prop);
+	xmlFree(prop);
 }; /* ndPropFree(ndPropPtr) */
 
 void ndPropListFree(ndPropPtr prop) {
@@ -259,7 +264,7 @@ void ndPropPrint(FILE * fp, ndPropPtr prop, int format) {
 				fprintf(fp, "%s=\"%s\"", prop->name, prop->value);
 		}
 		if (prop->ns)
-			fprintf (fp, "; ns=\"%s\"\n", prop->ns);
+			fprintf(fp, "; ns=\"%s\"\n", prop->ns);
 		else
 			fprintf(fp, "\n");
 	} else if ( NDAV_PRINT_SEXP(format) ) {
@@ -362,7 +367,7 @@ void * ndHTTPMethod( const char * URL,
 			return NULL;
 			
 		if (header_buf == NULL)
-			return (NULL);
+			return NULL;
 		
 		if (returnCode == 407) {
 			if (proxy_auth_header)
@@ -437,7 +442,7 @@ int nd_dav_request( char * method,
 	if (output == NULL)
 		return -1;
 
-	while ( (len = xmlNanoHTTPRead(ctxt, buffer,sizeof (buffer))) > 0 )
+	while ( (len = xmlNanoHTTPRead(ctxt, buffer,sizeof(buffer))) > 0 )
 		xmlBufferAdd(output, buffer, len);
 
 	xmlNanoHTTPClose(ctxt);
@@ -473,11 +478,11 @@ int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
 						 strlen(verboseQuery), buf_return);
 	/*
 	if (url[strlen(url) - 1] == '/')
-		return nd_dav_request ("PROPFIND", url, fn, "Depth: 1\r\n", NULL, 0,
+		return nd_dav_request("PROPFIND", url, fn, "Depth: 1\r\n", NULL, 0,
 				 buf_return);
 	else
-		return nd_dav_request ("PROPFIND", url, fn, "Depth: 0\r\n", verboseQuery,
-				 strlen (verboseQuery),
+		return nd_dav_request("PROPFIND", url, fn, "Depth: 0\r\n", verboseQuery,
+				 strlen(verboseQuery),
 				 buf_return);
 	*/
 }; /* nd_propfind_all_query(char *, ndAuthCtxtPtr, int, xmlBufferPtr *) */
@@ -535,7 +540,7 @@ ndLockInfoPtr nd_parse_activelock(xmlNodePtr cur) {
 	cur = cur->children;
 
 	/*
-	 * activelock (lockscpoe, locktype, depth, owner?, timeout? locktoken?)
+	 * activelock(lockscpoe, locktype, depth, owner?, timeout? locktoken?)
 	 */
 	while (cur != NULL) {
 		if ( nd_dav_name_equal(cur, "lockscope") ) {
@@ -642,7 +647,7 @@ void nd_parse_prop(xmlNodePtr cur, ndNodeInfoPtr node) {
 			if ( cur->ns && cur->ns->href
 					&& strcmp((char *) cur->ns->href, "DAV:") )
 				node->props->ns = xmlMemStrdup((char *) cur->ns->href);
-			// ndPropPrint (stderr, node->props, format | ND_PRINT_AS_SEXP);
+			// ndPropPrint(stderr, node->props, format | ND_PRINT_AS_SEXP);
 			node->props->next = prop;
 		}
 		cur = cur->next;
@@ -706,9 +711,9 @@ int nd_parse_propstat(xmlNodePtr cur, ndNodeInfoPtr node) {
 
 				code = ret;
 			}
-			xmlFree (status);
+			xmlFree(status);
 		} /* case status */
-		else if (nd_dav_name_equal (cur, "responsedescription"))
+		else if ( nd_dav_name_equal(cur, "responsedescription") )
 		{
 		} /* case responsedescription */
 		cur = cur->next;
@@ -723,7 +728,7 @@ ndNodeInfoPtr nd_parse_prop_href(xmlNodePtr cur) {
 	ret = ndNodeInfoNew();
 	ret->name = (char *) xmlNodeGetContent(cur);
 
-	return (ret);
+	return ret;
 }; /* nd_parse_prop_href(xmlNodePtr cur) */
 
 ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
@@ -733,7 +738,7 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 	cur = cur->children;
 
 	/*
-	 * response (href, ((href*, status)|(propstat+)), responsedescription?
+	 * response(href, ((href*, status)|(propstat+)), responsedescription?
 	 */
 	while (cur != NULL) {
 		if ( nd_dav_name_equal(cur, "href") ) {
@@ -799,7 +804,7 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 
 					res->status = ret;
 				}
-				xmlFree (status);
+				xmlFree(status);
 			}
 		} /* case status */
 		else if ( nd_dav_name_equal(cur, "responsedescription") )
@@ -809,7 +814,7 @@ ndNodeInfoPtr nd_parse_response(xmlNodePtr cur) {
 		cur = cur->next;
 	} /* while */
 
-	return (ret);
+	return ret;
 }; /* nd_parse_response(xmlNodePtr cur) */
 
 ndNodeInfoPtr nd_parse_multistatus(xmlNodePtr cur) {
@@ -857,11 +862,11 @@ int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
 	if (buf == NULL)
 		return code;
 	
-	// fprintf (stderr, "%s\n", xmlBufferContent(buf));
+	// fprintf(stderr, "%s\n", xmlBufferContent(buf));
 	doc = xmlParseMemory((char *) xmlBufferContent(buf),
 							xmlBufferLength(buf));
 	if (doc == NULL) {
-			xmlBufferFree (buf);
+			xmlBufferFree(buf);
 			return -1;
 	}
 
@@ -938,7 +943,7 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		doc = xmlParseMemory((char *) xmlBufferContent(buf),
 								xmlBufferLength(buf));
 		if (doc == NULL) {
-			xmlBufferFree (buf);
+			xmlBufferFree(buf);
 			return -1;
 		}
 
@@ -987,7 +992,7 @@ int ndPut(char * url, ndAuthCtxtPtr auth, char * content, int length,
 		if (buf == NULL)
 			return -1;
 		while ( (len = xmlNanoHTTPRead(ctxt, s, sizeof(s))) > 0 )
-			xmlBufferAdd (buf, s, len);
+			xmlBufferAdd(buf, s, len);
 
 		doc = xmlParseMemory((char *) xmlBufferContent(buf),
 								xmlBufferLength(buf));
@@ -1042,7 +1047,7 @@ int ndPost(char * url, ndAuthCtxtPtr auth, char * content, int length,
 	if (output == NULL)
 		return -1;
 
-	while ( (len = xmlNanoHTTPRead(ctxt, buffer, sizeof (buffer))) > 0 )
+	while ( (len = xmlNanoHTTPRead(ctxt, buffer, sizeof(buffer))) > 0 )
 		xmlBufferAdd(output, buffer, len);
 
 	xmlNanoHTTPClose(ctxt);
@@ -1074,8 +1079,8 @@ int ndPostPrint(char * url, ndAuthCtxtPtr auth, char * content,
 		return returnCode;
 	} /* code >= 300 */
 
-	while ( (len = xmlNanoHTTPRead(ctxt, buffer, sizeof (buffer))) > 0 )
-		fwrite (buffer, len, sizeof(xmlChar), outfp);
+	while ( (len = xmlNanoHTTPRead(ctxt, buffer, sizeof(buffer))) > 0 )
+		fwrite(buffer, len, sizeof(xmlChar), outfp);
 
 	xmlNanoHTTPClose(ctxt);
 
@@ -1205,7 +1210,7 @@ int ndLock(char * url, ndAuthCtxtPtr auth, int depth, char * owner,
 
 		ret = nd_parse_lock_answer(doc->children);
 		xmlFreeDoc(doc);
-		xmlBufferFree (buf);
+		xmlBufferFree(buf);
 		*li_return = ret;
 	}
 
@@ -1269,7 +1274,7 @@ int ndMkCol(char * url, ndAuthCtxtPtr auth, char * token) {
 		return -1;
 
 	code = xmlNanoHTTPReturnCode(ctxt);
-	xmlNanoHTTPClose (ctxt);
+	xmlNanoHTTPClose(ctxt);
 
 	return code;
 }; /* ndMkCol(char *, ndAuthCtxtPtr, char *) */

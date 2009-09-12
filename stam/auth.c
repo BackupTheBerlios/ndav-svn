@@ -98,7 +98,7 @@ char * nd_extract_auth_val(xmlChar **q) {
 		}
 		*q = qq;
 		ret = (char *) xmlBufferContent(val);
-		xmlFree (val);
+		xmlFree(val);
 		return ret;
 }; /* nd_extract_auth_val(char **) */
 
@@ -131,7 +131,7 @@ ndAuthParamPtr ndAuthParamCreateBasic(void)
 {
 	ndAuthParamPtr param = xmlMalloc(sizeof(ndAuthParam) * 5);
 	param[0].name	= "name";
-	param[0].val	= xmlMemStrdup ("Basic");
+	param[0].val	= xmlMemStrdup("Basic");
 	param[1].name	= "realm";
 	param[1].val	= NULL;
 	param[2].name	= "user";
@@ -149,7 +149,7 @@ void ndAuthParamFree(ndAuthParamPtr auth_param) {
 
 	for (ap = auth_param; ap->name != NULL; ap++) {
 		if (ap->val != NULL)
-			xmlFree (ap->val);
+			xmlFree(ap->val);
 	}
 
 	xmlFree(auth_param);

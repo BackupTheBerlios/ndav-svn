@@ -72,7 +72,7 @@ const static struct option long_options[] = {
 	{0, 0, 0, 0}
 };
 
-void error_exit (int format, const char *fmt, ...) {
+void error_exit(int format, const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -194,7 +194,7 @@ int authenticate( ndAuthParamPtr param, int is_proxy) {
 
 #undef WAIT_FOR_END
 
-void null_error_handler (void *ctx, const char *msg, ...) {
+void null_error_handler(void *ctx, const char *msg, ...) {
 	/* Empty */
 }; /* null_error_handler(...) */
 
@@ -351,7 +351,7 @@ int main(int argc, char * argv[]) {
 
 						code = ndMove(url, auth, dest_url,
 										force_overwrite, token);
-						ndFreeAuthCtxt (auth);
+						ndFreeAuthCtxt(auth);
 
 						if ( RETURNED_AN_ERROR(code) )
 							error_exit(format, "MOVE failed, `%s'",
@@ -381,7 +381,7 @@ int main(int argc, char * argv[]) {
 							error_exit(format, "token is not required");
 
 						code = ndGet(url, auth, &ct_return, &buf);
-						ndFreeAuthCtxt (auth);
+						ndFreeAuthCtxt(auth);
 
 						if ( RETURNED_AN_ERROR(code) )
 		
@@ -414,7 +414,7 @@ int main(int argc, char * argv[]) {
 							ndNodeInfoListPrint(stdout, ret, format);
 						else
 							error_exit(format, "PROPFIND failed, `%s'",
-										ndReasonPhrase (code));
+										ndReasonPhrase(code));
 					};
 					break;
 		case 'l':	{
@@ -429,13 +429,12 @@ int main(int argc, char * argv[]) {
 									: ND_DEPTH_0;
 
 						code = ndLock(url, auth, depth,
-									owner ? owner : getenv ("USER"),
+									owner ? owner : getenv("USER"),
 									scope, timeout, &lock);
 						ndFreeAuthCtxt(auth);
 
 						if (lock) {
 							ndLockInfoPrint(stdout, lock, format);
-							fprintf(stdout, "\n");
 						} else
 							error_exit(format, "LOCK failed, `%s'",
 										ndReasonPhrase(code));
@@ -463,7 +462,7 @@ int main(int argc, char * argv[]) {
 					};
 					break;
 		case 'P':	{
-						xmlBufferPtr buf = xmlBufferCreate ();
+						xmlBufferPtr buf = xmlBufferCreate();
 						int len;
 						unsigned char s [1024];
 						int ret;
@@ -474,7 +473,7 @@ int main(int argc, char * argv[]) {
 										strerror(errno));
 
 						while ( (len = fread(s, sizeof(unsigned char),
-												sizeof (s), fp))
+												sizeof(s), fp))
 									> 0)
 							xmlBufferAdd(buf, s, len);
 
@@ -509,7 +508,7 @@ int main(int argc, char * argv[]) {
 
 						if ( RETURNED_AN_ERROR(ret) )
 							error_exit(format, "DELETE failed, `%s'",
-										ndReasonPhrase (ret));
+										ndReasonPhrase(ret));
 					};
 					break;
 		case 'p':	{
@@ -518,22 +517,22 @@ int main(int argc, char * argv[]) {
 						int code;
 						FILE *fp;
 						ndNodeInfoPtr ret = NULL;
-						xmlBufferPtr buf = xmlBufferCreate ();
+						xmlBufferPtr buf = xmlBufferCreate();
 
 						if ((fp = fopen(infile, "r")) == NULL)
 							error_exit(format, "%s, %s",
-										infile, strerror (errno));
+										infile, strerror(errno));
 
 						while ( (len = fread(s, sizeof(unsigned char),
-												sizeof (s), fp))
+												sizeof(s), fp))
 								> 0)
 							xmlBufferAdd(buf, s, len);
 
 		
 						fclose(fp);
 						code = ndPut(url, auth,
-									(char *) xmlBufferContent (buf),
-									xmlBufferLength (buf), token, &ret);
+									(char *) xmlBufferContent(buf),
+									xmlBufferLength(buf), token, &ret);
 						ndFreeAuthCtxt(auth);
 
 						if ( RETURNED_AN_ERROR(code) )
