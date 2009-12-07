@@ -1,3 +1,9 @@
+2009-12-07	Mats Erik Andersson <meand@users.berlios.de>
+
+	* Adjustments for release 0.1.0 at Berlios.de.
+
+	* Rebuilt autotools information.
+
 2009-09-08  Mats Erik Andersson <meand@users.berlios.de>
 
 	* main.c, ndav.c, ndav.h, ndav.1: 
