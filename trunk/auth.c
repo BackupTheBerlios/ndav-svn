@@ -4,7 +4,7 @@
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.
  *
- * Copyright (C) 2009 Mats Erik Andersson <mats.andersson@gisladisker.se>
+ * Copyright (C) 2009 Mats Erik Andersson <meand@users.berlios.de>
  *
  * $Id$
  *

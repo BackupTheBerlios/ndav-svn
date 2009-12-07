@@ -1,6 +1,6 @@
 ndav -- Small command line interface to WebDAV servers.
 
-		Author: 2009 (C) Mats Erik Andersson <mats.andersson@gisladisker.se>
+		Author: 2009 (C) Mats Erik Andersson <meand@users.berlios.de>
 
 
 Ndav implements command line tool to WebDAV servers, with the aim to
