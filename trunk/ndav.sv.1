@@ -1,0 +1,233 @@
+.\"     Title: ndav
+.\"    Author: Mats Erik Andersson
+.\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
+.\"      Date: 11:e september 2009
+.\"    Manual: Ndav
+.\"    Source: Ndav __version__
+.\"
+.TH "NDAV" "sv.1" "11:e september 2009" "Ndav __version__" "Ndav"
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAMN"
+ndav \- Litet kommandoradsverktyg mot WebDAV.
+.SH "SYNOPSIS"
+.HP 5
+\fBndav\fR [\fBoptions\fR] {\fIurl\fR}
+.HP 5
+\fBndav\fR {\fB\-h\fR | \fB\-\-help\fR}
+.SH "BESKRIVNING"
+.PP
+
+\fBndav\fR
+\(:ar ett verktyg f\(:or att st\(:alla fr\(oagor till en webdav\-tj\(:anst, liksom f\(:or att l\(oata utf\(:ora \(:onskade \(oatg\(:arder s\(oasom uppl\(:agg, omflyttning och egenskapsf\(:or\(:andringar\&. Allt det en webdav\-tj\(:anst skall kunna erbjuda\&.
+.PP
+Utan programv\(:axlar \(:ar den f\(:orvalda \(oatg\(:arden att h\(:amta det uppgivna m\(oalet, en r\(:attfram GET\-f\(:orfr\(oagan\&.
+.PP
+Avsikten \(:ar att hela Webdav\-standarden, RFC 2518, skall uppfyllas av detta verktyg\&.
+.SH "PROGRAMV\(:AXLAR"
+.PP
+\fB\-h\fR | \fB\-\-help\fR
+.RS 4
+Sammanfatting av m\(:ojlig anv\(:andning\&.
+.RE
+.PP
+\fB\-c\fR | \fB\-\-copy\-to\fR \fIm\(oal\-url\fR
+.RS 4
+Utf\(:or en COPY\-\(oatg\(:ard med det uppgivna m\(oalet
+\fIm\(oal\-url\fR\&.
+.RE
+.PP
+\fB\-P\fR | \fB\-\-post\fR \fIfil\fR
+.RS 4
+K\(:allan
+\fIfil\fR
+kopieras till
+\fIurl\fR
+medelst en POST\-\(oatg\(:ard\&. Programv\(:axeln
+\fB\-T\fR
+kan nyttjas f\(:or att angiva inneh\(oallets slag\&.
+.RE
+.PP
+\fB\-p\fR | \fB\-\-put\fR \fIfil\fR
+.RS 4
+K\(:allan
+\fIfile\fR
+kopieras till
+\fIurl\fR
+medelst en PUT\-\(oatg\(:ard\&. En l\(oasningsmark\(:or kan s\(:attas med hj\(:alp av programv\(:axeln
+\fB\-t\fR\&.
+.RE
+.PP
+\fB\-m\fR | \fB\-\-move\-url\fR \fIm\(oal\-url\fR
+.RS 4
+K\(:allan
+\fIdest\-url\fR
+flyttas till
+\fIurl\fR
+medelst en MOVE\-\(oatg\(:ard\&. En l\(oasningsmark\(:or kan s\(:attas med hj\(:alp av programv\(:axeln
+\fB\-t\fR\&.
+.RE
+.PP
+\fB\-d\fR | \fB\-\-delete\fR
+.RS 4
+Tag bort m\(oalet
+\fIurl\fR
+genom att s\(:anda en DELETE\-beg\(:aran\&. En l\(oasningsmark\(:or kan s\(:attas med hj\(:alp av programv\(:axeln
+\fB\-t\fR\&.
+.RE
+.PP
+\fB\-l\fR | \fB\-\-lock\fR
+.RS 4
+Ett \(oatkomstl\(oas s\(:attes p\(oa m\(oalet
+\fIurl\fR
+med hj\(:alpav en LOCK\-beg\(:aran\&. Programv\(:axlarna
+\fB\-i\fR,
+\fB\-o\fR
+och
+\fB\-s\fR
+kommer tillsammans att beskriva l\(oasningens egenskaper\&.
+.RE
+.PP
+\fB\-o\fR | \fB\-\-owner\fR \fInamn\fR
+.RS 4
+Best\(:ammer l\(oasningens \(:agare till att vara
+\fInamn\fR\&. Det f\(:orvalda \(:agarnamnet h\(:amtas fr\(oan milj\(:ovariabeln USER\&.
+.RE
+.PP
+\fB\-s\fR | \fB\-\-scope\fR \fIomf\(oang\fR
+.RS 4
+Best\(:ammer l\(oasningens r\(:ackvidd till att vara
+\fIomf\(oang\fR\&. De m\(:ojliga v\(:ardena \(:ar "shared" och "exclusive"\&. Det senare v\(:ardet \(:ar f\(:orvalt\&.
+.RE
+.PP
+\fB\-i\fR | \fB\-\-timeout\fR \fItidsrymd\fR
+.RS 4
+S\(:atter l\(oasningens giltighetstid till
+\fItidsrymd\fR\&. F\(:orvalt \(:ar "Infinite"\&.
+.RE
+.PP
+\fB\-t\fR | \fB\-\-token\fR \fInyckel\fR
+.RS 4
+S\(:atter l\(oasningens \(:oppningsnyckel till str\(:angen
+\fInyckel\fR\&.
+.RE
+.PP
+\fB\-e\fR | \fB\-\-edit\-prop\fR \fInamn=v\(:arde\fR
+.RS 4
+Skriv om egenskapen
+\fIname\fR
+f\(:or m\(oalet
+\fIurl\fR, och tilldela detta v\(:ardet
+\fIv\(:arde\fR\&. Detta verkst\(:alles av en PROPPATCH\-\(oatg\(:ard\&.
+.RE
+.PP
+\fB\-k\fR | \fB\-\-mkcol\fR
+.RS 4
+Skapar m\(oalet
+\fIurl\fR
+med hj\(:alp av en MKCOL\-beg\(:aran\&.
+.RE
+.PP
+\fB\-N\fR | \fB\-\-namespace\fR \fIstr\(:ang\fR
+.RS 4
+Best\(:ammer att
+\fInamespace\-url\fR
+skall nyttjas som namnomr\(oade n\(:ar filegenskaper \(:andras med endera av programv\(:axlarna
+\fB\-e\fR
+eller
+\fB\-g\fR\&.
+.RE
+.PP
+\fB\-T\fR | \fB\-\-content\-type\fR \fIstr\(:ang\fR
+.RS 4
+Angiver v\(:ardet
+\fIstr\(:ang\fR
+p\(oa Content\-Type\-m\(:arket n\(:ar en POST\-\(oatg\(:ard utf\(:ores\&. Den f\(:orvalda MIME\-klassen \(:ar "application/x\-www\-form\-urlencoded"\&.
+.RE
+.PP
+\fB\-u\fR | \fB\-\-unlock\fR
+.RS 4
+Fris\(:att m\(oalet
+\fIurl\fR
+med en UNLOCK\-beg\(:aran\&. Programv\(:axeln
+\fB\-t\fR
+m\(oaste skickas med i anropet\&.
+.RE
+.PP
+\fB\-v\fR | \fB\-\-view\fR
+.RS 4
+H\(:amta information om m\(oalet
+\fIurl\fR
+med hj\(:alp av en PROPFIND\-beg\(:aran\&. Tillsammans med programv\(:axeln
+\fB\-g\fR
+kommer en avgr\(:ansad egenskapsm\(:angd att inh\(:amtas\&.
+.RE
+.PP
+\fB\-f\fR | \fB\-\-force\fR
+.RS 4
+Framtvingar utf\(:orande av \(oatg\(:arderna MOVE och COPY, \(:aven om m\(oalet redan skulle finnas till\&.
+.RE
+.PP
+\fB\-g\fR | \fB\-\-get\-prop\fR \fInamn\fR
+.RS 4
+Angiv att en egenskapsf\(:orfr\(oagan skall avgr\(:ansas till att handla om egenskapen
+\fInamn\fR\&. Detta inverkar p\(oa visningen med programv\(:axeln
+\fB\-v\fR\&.
+.RE
+.PP
+\fB\-r\fR | \fB\-\-recursive\fR
+.RS 4
+S\(:att bearbetningsdjupet till "Infinity"\&. Detta inneb\(:ar en rekursiv genoms\(:okning av m\(oalet\&.
+.RE
+.PP
+\fB\-a\fR | \fB\-\-auth\fR \fInamn\fR
+.RS 4
+Uppgiv att autentifiering skall ske f\(:or
+\fInamn\fR\&.
+.RE
+.PP
+\fB\-A\fR | \fB\-\-proxy\-auth\fR \fInamn\fR
+.RS 4
+Uppgiv att f\(:ormedlingidentiteten \(:ar
+\fInamn\fR\&.
+.RE
+.PP
+\fB\-S\fR | \fB\-\-s\-expr\fR
+.RS 4
+Utskrift sker i form av s\-uttryck\&.
+.RE
+.PP
+\fB\-q\fR | \fB\-\-quiet\fR
+.RS 4
+\(oAstadkom en sparsmakad utskrift, i den mening att endast efterfr\(oagade egenskaper skall skrivas ut och inga namnrubriker\&.
+.RE
+.SH "OMGIVNINGSVARIABLER"
+.PP
+http_proxy, HTTP_PROXY\&.
+.RS 4
+Best\(:ammer f\(:ormedlingstj\(:anst f\(:or http\-trafik\&.
+.RE
+.PP
+USER
+.RS 4
+Det \(:agarnamn under vilket alla \(oatg\(:arder skall komma att uthandlas med webdav\-tj\(:ansten\&.
+.RE
+.SH "SE \(:AVEN"
+.PP
+
+\fBlibxml\fR(3)
+.SH "UPPHOVSMAN"
+.PP
+Texten har skrivits av Mats Erik Andersson f\(:or
+Debian GNU/Linux(TM), men m\(oa fritt nyttjas f\(:or andra \(:andam\(oal\&. M\(oangfaldigande, utgivning och \(:andring av detta dokument m\(oa g\(:oras under European Union Public License, version 1\&.1\&.
+.SH "AUTHOR"
+.PP
+\fBMats Erik Andersson\fR
+.sp -1n
+.IP "" 4
+Author.
+.SH "COPYRIGHT"
+Copyright \(co 2009 Mats Erik Andersson
+.br

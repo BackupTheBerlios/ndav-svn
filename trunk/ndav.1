@@ -1,175 +1,236 @@
-.\" Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
+.\"     Title: ndav
+.\"    Author: Mats Erik Andersson
+.\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
+.\"      Date: September 11th, 2009
+.\"    Manual: Ndav
+.\"    Source: Ndav __version__
 .\"
-.\" Permission is hereby granted, free of charge, to any person obtaining
-.\" a copy of this software and associated documentation files (the
-.\" "Software"), to deal in the Software without restriction, including
-.\" without limitation the rights to use, copy, modify, merge, publish,
-.\" distribute, sublicense, and/or sell copies of the Software, and to
-.\" permit persons to whom the Software is furnished to do so, subject to
-.\" the following conditions:
-.\"
-.\" The above copyright notice and this permission notice shall be
-.\" included in all copies or substantial portions of the Software.
-.\"
-.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-.\" EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-.\" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-.\" NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-.\" LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-.\" OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-.\" WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-.\"
-.TH ND 1 "Febrary 25, 2002"
-.SH NAME
-nd \- Tiny little command line WebDAV interface
-.\"
-.SH SYNOPSIS
-nd
-.RI [ options ]
-.RI url
-.\"
-.SH DESCRIPTION
-.B nd
-privides a simple command line interface to the RFC 2518 (WebDAV) server. If no option is specifed, HTTP GET command is issued and writes response data to the standard output.
+.TH "NDAV" "1" "September 11th, 2009" "Ndav __version__" "Ndav"
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAME"
+ndav \- Small command line interface to WebDAV servers.
+.SH "SYNOPSIS"
+.HP 5
+\fBndav\fR [\fBoptions\fR] {\fIurl\fR}
+.HP 5
+\fBndav\fR {\fB\-h\fR | \fB\-\-help\fR}
+.SH "DESCRIPTION"
 .PP
-The options are as follows:
-.TP 8
-.BI \-c " dest_url"
-COPY
-.IR url
-to the
-.IR dest_url .
-Use lock token if 
-.B \-t
-is specified. 
-.TP 8
-.BI \-f
-Force override the content even when the MOVE or COPY target already exits.
-.TP 8
-.BI \-v
-View property information of
-.IR url
-by PROPFIND. With 
-.B \-g
-option, only the specified property is displayed.
-.TP 8
-.BI \-q
-Print quietly, meaning that only properties are printed, not headers.
-.TP 8
-.BI \-p " file"
-PUT
-.IR file
-content to the
-.IR url .
-Use lock token if 
-.B \-t
-is specified.
-.TP 8
-.BI \-g " name"
-Specify the property name for
-.B \-v
-option.
-.TP 8
-.BI \-e " name=value"
-Edit the property with name to value using PROPPATCH .
-.TP 8
-.BI \-N " namespace-url"
-Specify the property namespace URL for 
-.B \-e
+
+\fBndav\fR
+is a command line utility to communicate with a WebDAV\-server\&. This tools enables the user to perform all actions the server supports, actions that are described in the protocol standard\&.
+.PP
+In the absence of options, the default action is to send a GET\-request for the specified url\-target\&.
+.PP
+This utility intends to implement the complete WebDAV standard as expressed in RFC 2518\&.
+.SH "OPTIONS"
+.PP
+\fB\-h\fR | \fB\-\-help\fR
+.RS 4
+Shows a summary of available options\&.
+.RE
+.PP
+\fB\-c\fR | \fB\-\-copy\-to\fR \fIdest\-url\fR
+.RS 4
+Perform a COPY\-request with the specified destination
+\fIdest\-url\fR\&.
+.RE
+.PP
+\fB\-P\fR | \fB\-\-post\fR \fIfile\fR
+.RS 4
+The source
+\fIfile\fR
+is copied to
+\fIurl\fR
+using a POST\-request\&. The switch
+\fB\-T\fR
+is used to specify content type\&.
+.RE
+.PP
+\fB\-p\fR | \fB\-\-put\fR \fIfile\fR
+.RS 4
+The source
+\fIfile\fR
+is copied to
+\fIurl\fR
+using a PUT\-request\&. If so desired, the switch
+\fB\-t\fR
+activates a lock token\&.
+.RE
+.PP
+\fB\-m\fR | \fB\-\-move\-url\fR \fIdest\-url\fR
+.RS 4
+The source
+\fIdest\-url\fR
+is moved to
+\fIurl\fR
+using a MOVE\-request\&. If so desired, the switch
+\fB\-t\fR
+activates a lock token\&.
+.RE
+.PP
+\fB\-d\fR | \fB\-\-delete\fR
+.RS 4
+Delete the target
+\fIurl\fR
+by sending a DELETE\-request\&. If so desired, the switch
+\fB\-t\fR
+activates a lock token\&.
+.RE
+.PP
+\fB\-l\fR | \fB\-\-lock\fR
+.RS 4
+Lock down the access to
+\fIurl\fR
+by sending a LOCK\-request\&. The switches
+\fB\-i\fR,
+\fB\-o\fR, and
+\fB\-s\fR, together specify the properties of this lock\&.
+.RE
+.PP
+\fB\-o\fR | \fB\-\-owner\fR \fIname\fR
+.RS 4
+Specify the lock owner as
+\fIname\fR\&. The default owner is taken from the shell environment variable USER\&.
+.RE
+.PP
+\fB\-s\fR | \fB\-\-scope\fR \fIextent\fR
+.RS 4
+Specify the locking scope as
+\fIextent\fR\&. Possible values are "shared" and "exclusive"\&. The latter of these is the default choice\&.
+.RE
+.PP
+\fB\-i\fR | \fB\-\-timeout\fR \fItime\fR
+.RS 4
+Specify the locking timeout as
+\fItime\fR\&. The default value is "Infinite"\&.
+.RE
+.PP
+\fB\-t\fR | \fB\-\-token\fR \fIstring\fR
+.RS 4
+Specify the lock token as
+\fIstring\fR\&.
+.RE
+.PP
+\fB\-e\fR | \fB\-\-edit\-prop\fR \fIname=value\fR
+.RS 4
+Edit the named property
+\fIname\fR
+of
+\fIurl\fR, and assign
+\fIvalue\fR
+to it\&. This is done using a PROPPATCH\-request\&.
+.RE
+.PP
+\fB\-k\fR | \fB\-\-mkcol\fR
+.RS 4
+Creates the target
+\fIurl\fR
+using a MKCOL\-request\&.
+.RE
+.PP
+\fB\-N\fR | \fB\-\-namespace\fR \fInamespace\-url\fR
+.RS 4
+Specify
+\fInamespace\-url\fR
+to be used as namespace when manipulating properties with either of the options
+\fB\-e\fR
 or
-.B \-g
-option.
-.TP 8
-.BI \-P " file"
-POST
-.IR file
-content to the
-.IR url .
-.B \-T
-is used for the Content-Type.
-.TP 8
-.BI \-T " content_type"
-Use
-.IR content_type
-as a Content\-Type field value of the POST request.
-Default is `application/x\-www\-form\-urlencoded'.
-.TP 8
-.BI \-d
-DELETE
-.IR url .
-Use lock token if 
-.B \-t
-is specified. 
-.TP 8
-.BI \-l
-LOCK
-.IR url .
-Use 
-.B \-o
-as owner,
-.B \-s
-as scope,
-.B \-i
-as timeout.
-.TP 8
-.BI \-o " owner"
-Specify lock 
-.IR owner .
-Default is USER environment variable.
-.TP 8
-.BI \-s " scope"
-Specify lock
-.IR scope
-(`exclusive' or `shared'). Default is `exclusive'.
-.TP 8
-.BI \-i " timeout"
-Specify lock 
-.IR timeout
-interval. Default is `Infinite'.
-.TP 8
-.BI \-u
-UNLOCK
-.IR url .
-.BI \-t
-option is required.
-.TP 8
-.BI \-t " token"
-Specify the lock
-.IR token .
-.TP 8
-.BI \-r
-Set command execution `Depth' as `Infinity'.
-.TP 8
-.BI \-a " realm"
-Specify authentication
-.IR realm .
-.TP 8
-.BI \-A " realm"
-Specify proxy authentication
-.IR realm .
-.TP 8
-.BI \-k
-MKCOL
-.IR url
-\.
-.TP 8
-.BI \-m " dest_url"
-MOVE
-.IR url
-to the
-.IR dest_url .
-Use lock token if 
-.B \-t
-is specified. 
-.TP 8
-.BI \-S
-Print output using s\-expression.
-.SH ENVIRONMENT VARIABLES
-.TP 8
-.B http_proxy, HTTP_PROXY
-Specify HTTP proxy.
-.SH AUTHORS
-Yuuichi Teranishi (teranisi@gohome.org).
-.SH SEE ALSO
-.IR libxml (4).
-.\" end of manual page
+\fB\-g\fR\&.
+.RE
+.PP
+\fB\-T\fR | \fB\-\-content\-type\fR \fIcontent\fR
+.RS 4
+Specify
+\fIcontent\fR
+as the Content\-Type\-string to be committed in a POST\-request\&. The default MIME\-type is "application/x\-www\-form\-urlencoded"\&.
+.RE
+.PP
+\fB\-u\fR | \fB\-\-unlock\fR
+.RS 4
+Unlocks the target
+\fIurl\fR
+using an UNLOCK\-request\&. The token switch
+\fB\-t\fR
+is mandatory\&.
+.RE
+.PP
+\fB\-v\fR | \fB\-\-view\fR
+.RS 4
+Retreive property information for
+\fIurl\fR
+by issuing a PROPFIND\-request\&. When used with the switch
+\fB\-g\fR, a restricted property set is retreived\&.
+.RE
+.PP
+\fB\-f\fR | \fB\-\-force\fR
+.RS 4
+Enforces an override for the requests MOVE and COPY, even if the target already exists\&.
+.RE
+.PP
+\fB\-g\fR | \fB\-\-get\-prop\fR \fIname\fR
+.RS 4
+Specify the named property
+\fIname\fR
+in a PROPFIND\-request\&. This option restricts the outcome of the view\-switch
+\fB\-v\fR\&.
+.RE
+.PP
+\fB\-r\fR | \fB\-\-recursive\fR
+.RS 4
+Set the execution depth to "Infinity", meaning infinite descent into the file tree\&.
+.RE
+.PP
+\fB\-a\fR | \fB\-\-auth\fR \fIrealm\fR
+.RS 4
+Specify authentication scope as
+\fIrealm\fR\&.
+.RE
+.PP
+\fB\-A\fR | \fB\-\-proxy\-auth\fR \fIrealm\fR
+.RS 4
+Specify the proxy authentication scope as
+\fIrealm\fR\&.
+.RE
+.PP
+\fB\-S\fR | \fB\-\-s\-expr\fR
+.RS 4
+Prints output using s\-expressions\&.
+.RE
+.PP
+\fB\-q\fR | \fB\-\-quiet\fR
+.RS 4
+Print quietly, meaning that only properties are printed, not headers\&.
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.PP
+http_proxy, HTTP_PROXY\&.
+.RS 4
+Specifies a proxy server for HTTP\-traffic\&.
+.RE
+.PP
+USER
+.RS 4
+The value of owner to present to the WebDAV\-server\&.
+.RE
+.SH "SEE ALSO"
+.PP
+
+\fBlibxml\fR(3)
+.SH "AUTHOR"
+.PP
+This text was written by Mats Erik Andersson for the
+Debian GNU/Linux(TM)
+system, but may be used by others\&. Permission is granted to copy, distribute and/or modify this document under the terms of the European Union Public License, Version 1\&.1\&.
+.SH "AUTHOR"
+.PP
+\fBMats Erik Andersson\fR
+.sp -1n
+.IP "" 4
+Author.
+.SH "COPYRIGHT"
+Copyright \(co 2009 Mats Erik Andersson
+.br
