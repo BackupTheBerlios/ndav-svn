@@ -106,7 +106,8 @@ ndAuthParamPtr ndAuthParamCreate(struct http_auth * hauth, xmlChar * p) {
 	ndAuthParamPtr param, ap;
 
 	/* Init Param */
-	param = hauth->param_fn();
+	if ( (param = hauth->param_fn()) == NULL )
+		return NULL;
 
 	while (*p != '\0') {
 		SKIP_BLANKS(p);
@@ -182,6 +183,8 @@ int ndAuthParamSetValue(ndAuthParamPtr param, char *name, char *val) {
 
 ndAuthParamPtr ndAuthParamCreateDigest(void) {
 	/* Not yet implemented */
+	fprintf(stderr, "Digest authentication is not implemented.\n");
+
 	return NULL;
 }; /* ndAuthParamCreateDigest(void) */
 
