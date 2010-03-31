@@ -182,13 +182,34 @@ int ndAuthParamSetValue(ndAuthParamPtr param, char *name, char *val) {
 }; /* ndAuthParamSetValue(ndAuthParamPtr, char *, char *) */
 
 ndAuthParamPtr ndAuthParamCreateDigest(void) {
+	ndAuthParamPtr param;
+
+#if USE_DIGEST
+	param = xmlMalloc(sizeof(ndAuthParam) * 7);
+	param[0].name	= "name";
+	param[0].val	= xmlMemStrdup("Digest");
+	param[1].name	= "realm";
+	param[1].val	= NULL;
+	param[2].name	= "user";
+	param[2].val	= NULL;
+	param[3].name	= "nonce";
+	param[3].val	= NULL;
+	param[4].name	= "opaque";
+	param[4].val	= NULL;
+	param[5].name	= "uri";
+	param[5].val	= NULL;
+	param[6].name	= "responce";
+	param[6].val	= NULL;
+#else
 	/* Not yet implemented */
 	fprintf(stderr, "Digest authentication is not implemented.\n");
+	param = NULL;
+#endif
 
-	return NULL;
+	return param;
 }; /* ndAuthParamCreateDigest(void) */
 
-xmlBufferPtr ndAuthEncodeB(char *a) {
+xmlBufferPtr ndAuthEncodeBasic(char *a) {
 		unsigned char d[3];
 		unsigned char c1, c2, c3, c4;
 		int i, n_pad;
@@ -236,7 +257,7 @@ xmlBufferPtr ndAuthEncodeB(char *a) {
 		}; /* while(1) */
 
 		return w;
-}; /* ndAuthEncodeB(char *) */
+}; /* ndAuthEncodeBasic(char *) */
 
 xmlBufferPtr ndAuthBasic(ndAuthParamPtr param) {
 	xmlBufferPtr buf = xmlBufferCreate();
@@ -245,11 +266,30 @@ xmlBufferPtr ndAuthBasic(ndAuthParamPtr param) {
 	xmlBufferAdd(buf, (xmlChar *) ":", -1);
 	xmlBufferAdd(buf, (xmlChar *) ndAuthParamValue(param, "password"), -1);
 
-	return ndAuthEncodeB((char *) xmlBufferContent(buf));
+	return ndAuthEncodeBasic((char *) xmlBufferContent(buf));
 }; /* ndAuthBasic(ndAuthParamPtr) */
 
-xmlBufferPtr ndAuthDigest(ndAuthParamPtr param) {
+#if USE_DIGEST
+xmlBufferPtr ndAuthEncodeDigest(char *a) {
 	return NULL;
+}; /* ndAuthEncodeDigest(char *) */
+#endif
+
+xmlBufferPtr ndAuthDigest(ndAuthParamPtr param) {
+#if USE_DIGEST
+	xmlBufferPtr buf_ha1 = xmlBufferCreate();
+	xmlBufferPtr buf_ha2 = xmlBufferCreate();
+
+	xmlBufferAdd(buf_ha1, (xmlChar *) ndAuthParamValue(param, "user"), -1);
+	xmlBufferAdd(buf_ha1, (xmlChar *) ":", -1);
+	xmlBufferAdd(buf_ha1, (xmlChar *) ndAuthParamValue(param, "realm"), -1);
+	xmlBufferAdd(buf_ha1, (xmlChar *) ":", -1);
+	xmlBufferAdd(buf_ha1, (xmlChar *) ndAuthParamValue(param, "password"), -1);
+
+	return ndAuthEncodeDigest((char *) xmlBufferContent(buf_ha1));
+#else
+	return NULL;
+#endif
 }; /* ndAuthDigest(ndAuthPtr) */
 
 int ndAuthCreateHeader(char *str, ndAuthCallback fn,
