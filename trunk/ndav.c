@@ -31,6 +31,9 @@
 
 #include "ndav.h"
 
+const char *export_method = "";
+const char *export_uri = "";
+
 ndNodeInfoPtr ndNodeInfoNew() {
 	ndNodeInfoPtr ret = xmlMalloc(sizeof(ndNodeInfo));
 	if (ret == NULL)
@@ -308,7 +311,20 @@ void * ndHTTPMethod( const char * URL,
 	char line[ND_HEADER_LINE_MAX];
 	xmlBufferPtr header_buf = NULL;
 	xmlBufferPtr temp_buf = NULL;
+	char * uri = (char *) URL;
 
+	if (URL == NULL)
+		return NULL;
+
+	if ( !(uri = strchr(uri, '/')) || !(uri = strchr(++uri, '/')) || ! *uri)
+		return NULL;
+
+	if ( !(uri = strchr(++uri, '/')))
+		return NULL;
+
+	export_method = method;
+	export_uri = uri;
+ 
 	header_buf = xmlBufferCreate();
 	if (header_buf == NULL)
 		return NULL;

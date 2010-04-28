@@ -4,7 +4,7 @@ AC_INIT(main.c)
 
 PACKAGE=ndav
 MAJOR_VERSION=0
-MINOR_VERSION=1
+MINOR_VERSION=2
 MICRO_VERSION=0
 #INTERFACE_AGE=6
 BINARY_AGE=0
@@ -29,16 +29,20 @@ CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
 AC_CHECK_HEADERS(parser.h)
 LIBS="$LIBS `$XML_CONFIG --libs`"
 
+dnl Check for presence of libmhash.
+AC_CHECK_HEADERS(mhash.h)
+LIBS="$LIBS -lmhash"
+
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([errno.h fcntl.h stdlib.h string.h unistd.h libgen.h getopt.h])
+AC_CHECK_HEADERS([errno.h fcntl.h stdlib.h string.h unistd.h libgen.h getopt.h time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp getopt basename])
+AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp getopt basename time])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

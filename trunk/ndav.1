@@ -21,11 +21,16 @@ ndav \- Small command line interface to WebDAV servers.
 .PP
 
 \fBndav\fR
-is a command line utility to communicate with a WebDAV\-server\&. This tools enables the user to perform all actions the server supports, actions that are described in the protocol standard\&.
+is a command line utility to communicate with a WebDAV\-server\&.
+This tools enables the user to perform all actions the server supports,
+actions that are described in the protocol standard\&.
 .PP
-In the absence of options, the default action is to send a GET\-request for the specified url\-target\&.
+In the absence of options, the default action is to send a GET\-request
+for the specified url\-target\&.
 .PP
-This utility intends to implement the complete WebDAV standard as expressed in RFC 2518\&.
+This utility intends to implement the complete WebDAV standard as expressed
+in RFC 2518\&.
+.
 .SH "OPTIONS"
 .PP
 \fB\-h\fR | \fB\-\-help\fR
@@ -94,13 +99,15 @@ by sending a LOCK\-request\&. The switches
 \fB\-o\fR | \fB\-\-owner\fR \fIname\fR
 .RS 4
 Specify the lock owner as
-\fIname\fR\&. The default owner is taken from the shell environment variable USER\&.
+\fIname\fR\&. The default owner is taken from the shell
+environment variable USER\&.
 .RE
 .PP
 \fB\-s\fR | \fB\-\-scope\fR \fIextent\fR
 .RS 4
 Specify the locking scope as
-\fIextent\fR\&. Possible values are "shared" and "exclusive"\&. The latter of these is the default choice\&.
+\fIextent\fR\&. Possible values are "shared" and "exclusive"\&.
+The latter of these is the default choice\&.
 .RE
 .PP
 \fB\-i\fR | \fB\-\-timeout\fR \fItime\fR
@@ -146,7 +153,8 @@ or
 .RS 4
 Specify
 \fIcontent\fR
-as the Content\-Type\-string to be committed in a POST\-request\&. The default MIME\-type is "application/x\-www\-form\-urlencoded"\&.
+as the Content\-Type\-string to be committed in a POST\-request\&.
+The default MIME\-type is "application/x\-www\-form\-urlencoded"\&.
 .RE
 .PP
 \fB\-u\fR | \fB\-\-unlock\fR
@@ -160,10 +168,10 @@ is mandatory\&.
 .PP
 \fB\-v\fR | \fB\-\-view\fR
 .RS 4
-Retreive property information for
+Retrieve property information for
 \fIurl\fR
 by issuing a PROPFIND\-request\&. When used with the switch
-\fB\-g\fR, a restricted property set is retreived\&.
+\fB\-g\fR, a restricted property set is retrieved\&.
 .RE
 .PP
 \fB\-f\fR | \fB\-\-force\fR
@@ -222,9 +230,12 @@ The value of owner to present to the WebDAV\-server\&.
 \fBlibxml\fR(3)
 .SH "AUTHOR"
 .PP
-This text was written by Mats Erik Andersson for the
-Debian GNU/Linux(TM)
-system, but may be used by others\&. Permission is granted to copy, distribute and/or modify this document under the terms of the European Union Public License, Version 1\&.1\&.
+This text was first written by Mats Erik Andersson for the
+Debian GNU/Linux(TM) system, but may be used by others\&.
+Permission is granted to copy, distribute and/or modify
+this document under the terms of the
+European Union Public License, Version 1\&.1\&.
+.
 .SH "AUTHOR"
 .PP
 \fBMats Erik Andersson\fR
@@ -232,5 +243,5 @@ system, but may be used by others\&. Permission is granted to copy, distribute a
 .IP "" 4
 Author.
 .SH "COPYRIGHT"
-Copyright \(co 2009 Mats Erik Andersson
+Copyright \(co 2009, 2010 Mats Erik Andersson
 .br

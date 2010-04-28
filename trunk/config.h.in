@@ -69,6 +69,12 @@
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
 
+/* Define as 1 if you have the <hmash.h> header file. */
+#undef HAVE_MHASH_H
+
+/* Define to 1 if you have the `time' function. */
+#undef HAVE_TIME
+
 /* Name of package */
 #undef PACKAGE
 
