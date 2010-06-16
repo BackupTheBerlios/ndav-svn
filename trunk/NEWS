@@ -1,3 +1,12 @@
 2009-08-30
 
 	* nd-0.8.2 forked as ndav-0.0.1
+
+2009-12-07
+
+	* Initial release ndav-0.1.0.
+
+2010-06-16
+
+	* Release of ndav-0.2.0.
+	* Authentication using digests has now been added.

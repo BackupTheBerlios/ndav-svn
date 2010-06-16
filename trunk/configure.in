@@ -44,5 +44,19 @@ AC_C_CONST
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([getpass memset strchr strerror strncasecmp getopt basename time])
 
+dnl Determine the situation for digests
+digest_default="yes"
+
+AC_ARG_ENABLE(digest, [  --enable-digest         support digest authentication (yes)],, enable_digest=$digest_default)
+
+AC_SUBST(CFLAGS)
+
+if test "x$enable_digest" = "xyes"; then
+	CFLAGS="$CFLAGS -DUSE_DIGEST=1"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

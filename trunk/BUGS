@@ -1,0 +1,15 @@
+Known bugs
+----------
+
+  ndav-0.2.0: Due to properties inherent in libxml2, ndav cannot always
+              descend into a directory protected by a digest password.
+              For example, 
+
+                ndav -v http://repos.net/dig
+
+              can end with "Bad request" due to a failed PROPFIND when
+              Apache2 is used as WebDAV server, whereas the related call
+
+                ndav -v http://repos.net/dig/
+
+              will correctly sense the complete directory.
