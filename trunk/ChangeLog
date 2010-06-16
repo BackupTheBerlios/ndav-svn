@@ -1,3 +1,13 @@
+2010-06-16	Mats Erik Andersson <meand@users.berlios.de>
+
+	* Let 'configure.in' sense the switch '--enable-digest'.
+
+	* Preparations for release 0.2.0 at Berlios.de.
+
+2010-04-28	Mats Erik Andersson <meand@users.berlios.de>
+
+	* Implement digest authentication.
+
 2009-12-07	Mats Erik Andersson <meand@users.berlios.de>
 
 	* Adjustments for release 0.1.0 at Berlios.de.
