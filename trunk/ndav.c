@@ -12,20 +12,20 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
-#endif
+# include <sys/cdefs.h>
+#endif /* HAVE_SYS_CDEFS_H */
 
 #ifndef __unused
-#define __unused
-#endif
+# define __unused
+#endif /* !__unused */
 
 #include <stdio.h>
 #ifdef HAVE_STRING_H
-#include <string.h>
+# include <string.h>
 #endif /* HAVE_STRING_H */
 
 #include <ctype.h>

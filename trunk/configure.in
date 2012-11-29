@@ -31,7 +31,7 @@ if test "$XML_CONFIG" = "no"; then
 fi
 CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
 
-AC_CHECK_HEADERS(parser.h)
+AC_CHECK_HEADERS(libxml/parser.h)
 LIBS="$LIBS `$XML_CONFIG --libs`"
 
 dnl Check for presence of libmhash.

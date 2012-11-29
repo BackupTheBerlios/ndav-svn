@@ -4178,12 +4178,12 @@ fi
 done
 
 
-for ac_header in parser.h
+for ac_header in libxml/parser.h
 do :
-  ac_fn_c_check_header_mongrel "$LINENO" "parser.h" "ac_cv_header_parser_h" "$ac_includes_default"
-if test "x$ac_cv_header_parser_h" = x""yes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_parser_h" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_PARSER_H 1
+#define HAVE_LIBXML_PARSER_H 1
 _ACEOF
 
 fi

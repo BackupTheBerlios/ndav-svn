@@ -27,6 +27,9 @@
 /* Define to 1 if you have the <libgen.h> header file. */
 #undef HAVE_LIBGEN_H
 
+/* Define to 1 if you have the <libxml/parser.h> header file. */
+#undef HAVE_LIBXML_PARSER_H
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -35,9 +38,6 @@
 
 /* Define to 1 if you have the <mhash.h> header file. */
 #undef HAVE_MHASH_H
-
-/* Define to 1 if you have the <parser.h> header file. */
-#undef HAVE_PARSER_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

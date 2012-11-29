@@ -12,25 +12,25 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#  include "config.h"
+# include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #ifdef HAVE_STRING_H
-#  define _GNU_SOURCE
-#  include <string.h>
+# define _GNU_SOURCE
+# include <string.h>
 #endif /* HAVE_STRING_H */
 
 #include <ctype.h>
 
 #ifdef HAVE_TIME
-#  include <time.h>
-#endif
+# include <time.h>
+#endif /* HAVE_TIME */
 
 #include "ndav.h"
 #include <libxml/tree.h>
 
 #if HAVE_MHASH_H
-#  include <mhash.h>
+# include <mhash.h>
 #endif /* HAVE_MHASH_H */
 
 #define SKIP_BLANKS(p) { while (*(p)&&isspace(*(p))) (p)++; }
@@ -45,7 +45,7 @@ extern const char *export_uri;
 #if HAVE_MHASH_H && USE_DIGEST
 static int nc = 0;
 static char nonce_sensor[64] = "";
-#endif
+#endif /* HAVE_MHASH_H && USE_DIGEST */
 
 struct http_auth {
 	char * name;
@@ -232,21 +232,21 @@ ndAuthParamPtr ndAuthParamCreateDigest(void) {
 	param[10].val	= NULL;
 
 	param[11].name  = "cnonce";
-#ifdef HAVE_TIME
+# ifdef HAVE_TIME
 	snprintf(timestring, sizeof(timestring), "%u", (unsigned int) time(0));
 	xmlBufferAdd(cnonce, (xmlChar *) timestring, -1);
-#endif
+# endif /* HAVE_TIME */
 	xmlBufferAdd(cnonce, (xmlChar *) ":197e5d7fa:nd", -1);
 	param[11].val   = (char *) xmlBufferContent(ndAuthEncodeDigest(cnonce));
 	xmlBufferFree (cnonce);
 
 	param[12].name  = NULL;
 	param[12].val   = NULL;
-#else
+#else /* !HAVE_MHASH_H || !USE_DIGEST */
 	/* Not yet implemented */
 	fprintf(stderr, "Digest authentication is not implemented.\n");
 	param = NULL;
-#endif
+#endif /* !HAVE_MHASH_H || !USE_DIGEST */
 
 	return param;
 }; /* ndAuthParamCreateDigest(void) */
@@ -317,9 +317,10 @@ xmlBufferPtr ndAuthEncodeDigest(xmlBufferPtr a) {
 	}
 
 	return w;
-#else
+#else /* !HAVE_MHASH_H || !USE_DIGEST */
+	(void) a;	/* Silence a warning.  */
 	return NULL;
-#endif /* HAVE_MHASH_H && USE_DIGEST */
+#endif /* !HAVE_MHASH_H || !USE_DIGEST */
 } /* ndAuthEncodeDigest(xmlBufferPtr) */
 
 xmlBufferPtr ndAuthBasic(ndAuthParamPtr param) {
@@ -343,7 +344,7 @@ void add_quoted_param(xmlBufferPtr buf, ndAuthParamPtr param,
 	xmlBufferAdd(buf, (xmlChar *) ndAuthParamValue(param, param_name), -1);
 	xmlBufferAdd(buf, (xmlChar *) "\"", -1);
 } /* add_quoted_param(xmlBufferPtr, ndAuthParamPtr) */
-#endif
+#endif /* USE_DIGEST && HAVE_MHASH_H */
 
 xmlBufferPtr ndAuthDigest(ndAuthParamPtr param) {
 #if USE_DIGEST && HAVE_MHASH_H
@@ -415,9 +416,10 @@ xmlBufferPtr ndAuthDigest(ndAuthParamPtr param) {
 		add_quoted_param(buf1, param, "opaque", "opaque", 1);
 
 	return buf1;
-#else
+#else /* !USE_DIGEST || !HAVE_MHASH_H */
+	(void) param;	/* Silence a warning.  */
 	return NULL;
-#endif
+#endif /* !USE_DIGEST || !HAVE_MHASH_H */
 }; /* ndAuthDigest(ndAuthPtr) */
 
 int ndAuthCreateHeader(char *str, ndAuthCallback fn,

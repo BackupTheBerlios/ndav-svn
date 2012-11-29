@@ -12,32 +12,32 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif /* HAVE_CONFIG_H */
 
 #ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
-#endif
+# include <sys/cdefs.h>
+#endif /* HAVE_SYS_CDEFS_H */
 
 #ifndef __unused
-#define __unused
-#endif
+# define __unused
+#endif /* !__unused */
 
 #include "ndav.h"
 
 #include <stdarg.h>
 #ifdef HAVE_STRING_H
-#include <string.h>
+# include <string.h>
 #endif /* HAVE_STRING_H */
 
 #ifdef HAVE_LIBGEN_H
-#include <libgen.h>
-#endif
+# include <libgen.h>
+#endif /* HAVE_LIBGEN_H */
 
 #ifdef HAVE_GETOPT_H
-#define _GNU_SOURCE
-#include <getopt.h>
-#endif
+# define _GNU_SOURCE
+# include <getopt.h>
+#endif /* HAVE_GETOPT_H */
 
 #include <libxml/parser.h>
 #include <libxml/nanohttp.h>
@@ -380,7 +380,7 @@ int main(int argc, char * argv[]) {
 						if ( RETURNED_AN_ERROR(code) )
 							error_exit(format, "GET failed, `%s'",
 										ndReasonPhrase(code));
-#else
+#else /* WAIT_FOR_END */
 						xmlBufferPtr buf = NULL;
 						int code;
 						char *ct_return = NULL;
@@ -398,7 +398,7 @@ int main(int argc, char * argv[]) {
 	
 						if ( buf )
 							fprintf(stdout, "%s", xmlBufferContent(buf));
-#endif
+#endif /* WAIT_FOR_END */
 					};
 					break;
 		case 'v':	{
