@@ -1,7 +1,5 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(main.c)
-
 PACKAGE=ndav
 MAJOR_VERSION=0
 MINOR_VERSION=2
@@ -11,8 +9,14 @@ BINARY_AGE=0
 
 VERSION=$MAJOR_VERSION.$MINOR_VERSION.$MICRO_VERSION
 
-AM_INIT_AUTOMAKE(ndav, $VERSION)
+AC_INIT([ndav], [0.2.0], [meand@users.berlios.de], ,
+	[http://developer.berlios.de/projects/ndav/])
 
+AC_CANONICAL_SYSTEM
+
+AM_INIT_AUTOMAKE([1.9])
+
+AC_CONFIG_SRCDIR(xml/ndav.css)
 AM_CONFIG_HEADER(config.h)
 
 # Checks for programs.
@@ -26,12 +30,14 @@ if test "$XML_CONFIG" = "no"; then
   AC_MSG_ERROR([libxml2 not installed - please install first])
 fi
 CPPFLAGS="$CPPFLAGS `$XML_CONFIG --cflags`"
+
 AC_CHECK_HEADERS(parser.h)
 LIBS="$LIBS `$XML_CONFIG --libs`"
 
 dnl Check for presence of libmhash.
 AC_CHECK_HEADERS(mhash.h)
-LIBS="$LIBS -lmhash"
+AC_CHECK_LIB(mhash, mhash_init, [LIBMHASH=-lmhash])
+AC_SUBST(LIBMHASH)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -51,12 +57,18 @@ AC_ARG_ENABLE(digest, [  --enable-digest         support digest authentication (
 
 AC_SUBST(CFLAGS)
 
-if test "x$enable_digest" = "xyes"; then
-	CFLAGS="$CFLAGS -DUSE_DIGEST=1"
+AC_MSG_CHECKING([if digest autentication is available])
+if test "x$enable_digest" = xyes \
+   && test "x$ac_cv_header_mhash_h" = xyes \
+   && test "x$ac_cv_lib_mhash_mhash_init" = xyes; then
+	AC_DEFINE(USE_DIGEST, 1, [Define to 1 for digest authentication.])
 	AC_MSG_RESULT(yes)
-else
+   else
+	LIBMHASH=
 	AC_MSG_RESULT(no)
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile xml/Makefile \
+	xml/handbok.mk \
+	xml/handbok.xml:xml/handbok.in.xml])
 AC_OUTPUT

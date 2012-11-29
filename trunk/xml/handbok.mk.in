@@ -19,9 +19,9 @@ endif
 
 KODNING = ISO-8859-1
 
-NAME = ndav
+NAME = @PACKAGE_NAME@
 
-VERSION = 0.0.1
+VERSION = @PACKAGE_VERSION@
 
 DBKSOURCE = handbok.xml
 
@@ -29,12 +29,9 @@ HANDBOK = handbok-$(OS).xml
 
 MANPAGES = man/$(NAME).1
 
-.PHONY: version manpages clean rensa
+.PHONY: manpages clean rensa
 
-manpages: version $(MANPAGES)
-
-version:
-	perl -i -p -e 's#__version__#$(VERSION)#' $(DBKSOURCE)
+manpages: $(MANPAGES)
 
 clean rensa:
 	rm -rf $(HANDBOK) man/ xhtml/

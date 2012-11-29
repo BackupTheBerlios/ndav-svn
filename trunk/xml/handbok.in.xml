@@ -14,8 +14,8 @@
 	<!ENTITY namn		"Mats Erik Andersson">
 
 	<!ENTITY paket		"Ndav">
-	<!ENTITY version	"__version__">
-	<!ENTITY prognamn	"ndav">
+	<!ENTITY version	"@PACKAGE_VERSION@">
+	<!ENTITY prognamn	"@PACKAGE_NAME@">
 	<!ENTITY handbok	"<refentrytitle>&prognamn;</refentrytitle>">
 
 	<!ENTITY debian		"<productname>Debian GNU/Linux</productname>">
