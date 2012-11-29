@@ -1,3 +1,9 @@
+2012-11-29	Mats Erik Andersson <meand@users.berlios.de>
+
+	* Fuller adaptions for autotools.
+
+	* Rebuilt manual pages.
+
 2010-06-16	Mats Erik Andersson <meand@users.berlios.de>
 
 	* Let 'configure.in' sense the switch '--enable-digest'.

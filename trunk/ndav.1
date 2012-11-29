@@ -1,21 +1,38 @@
+'\" t
 .\"     Title: ndav
 .\"    Author: Mats Erik Andersson
-.\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
 .\"      Date: September 11th, 2009
 .\"    Manual: Ndav
-.\"    Source: Ndav 0.1.0
+.\"    Source: Ndav 0.2.0
+.\"  Language: English
 .\"
-.TH "NDAV" "1" "September 11th, 2009" "Ndav 0.1.0" "Ndav"
+.TH "NDAV" "1" "September 11th, 2009" "Ndav 0\&.2\&.0" "Ndav"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
 .\" disable hyphenation
 .nh
 .\" disable justification (adjust text to left margin only)
 .ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
 .SH "NAME"
-ndav \- Small command line interface to WebDAV servers.
+ndav \- Small command line interface to WebDAV servers\&.
 .SH "SYNOPSIS"
-.HP 5
+.HP \w'\fBndav\fR\ 'u
 \fBndav\fR [\fBoptions\fR] {\fIurl\fR}
-.HP 5
+.HP \w'\fBndav\fR\ 'u
 \fBndav\fR {\fB\-h\fR | \fB\-\-help\fR}
 .SH "DESCRIPTION"
 .PP
@@ -25,12 +42,11 @@ is a command line utility to communicate with a WebDAV\-server\&.
 This tools enables the user to perform all actions the server supports,
 actions that are described in the protocol standard\&.
 .PP
-In the absence of options, the default action is to send a GET\-request
-for the specified url\-target\&.
+In the absence of options, the default action is to send a
+GET\-request for the specified url\-target\&.
 .PP
-This utility intends to implement the complete WebDAV standard as expressed
-in RFC 2518\&.
-.
+This utility intends to implement the complete WebDAV standard
+as expressed in RFC 2518\&.
 .SH "OPTIONS"
 .PP
 \fB\-h\fR | \fB\-\-help\fR
@@ -99,21 +115,21 @@ by sending a LOCK\-request\&. The switches
 \fB\-o\fR | \fB\-\-owner\fR \fIname\fR
 .RS 4
 Specify the lock owner as
-\fIname\fR\&. The default owner is taken from the shell
-environment variable USER\&.
+\fIname\fR\&. The default owner is taken from the shell environment
+variable USER\&.
 .RE
 .PP
 \fB\-s\fR | \fB\-\-scope\fR \fIextent\fR
 .RS 4
-Specify the locking scope as
-\fIextent\fR\&. Possible values are "shared" and "exclusive"\&.
+Specify the locking scope as \fIextent\fR\&.
+Possible values are "shared" and "exclusive"\&.
 The latter of these is the default choice\&.
 .RE
 .PP
 \fB\-i\fR | \fB\-\-timeout\fR \fItime\fR
 .RS 4
-Specify the locking timeout as
-\fItime\fR\&. The default value is "Infinite"\&.
+Specify the locking timeout as \fItime\fR\&.
+The default value is "Infinite"\&.
 .RE
 .PP
 \fB\-t\fR | \fB\-\-token\fR \fIstring\fR
@@ -124,12 +140,9 @@ Specify the lock token as
 .PP
 \fB\-e\fR | \fB\-\-edit\-prop\fR \fIname=value\fR
 .RS 4
-Edit the named property
-\fIname\fR
-of
-\fIurl\fR, and assign
-\fIvalue\fR
-to it\&. This is done using a PROPPATCH\-request\&.
+Edit the named property \fIname\fR of \fIurl\fR,
+and assign \fIvalue\fR to it\&.
+This is done using a PROPPATCH\-request\&.
 .RE
 .PP
 \fB\-k\fR | \fB\-\-mkcol\fR
@@ -141,67 +154,57 @@ using a MKCOL\-request\&.
 .PP
 \fB\-N\fR | \fB\-\-namespace\fR \fInamespace\-url\fR
 .RS 4
-Specify
-\fInamespace\-url\fR
-to be used as namespace when manipulating properties with either of the options
-\fB\-e\fR
-or
-\fB\-g\fR\&.
+Specify \fInamespace\-url\fR to be used as namespace when manipulating
+properties with either of the options \fB\-e\fR or \fB\-g\fR\&.
 .RE
 .PP
 \fB\-T\fR | \fB\-\-content\-type\fR \fIcontent\fR
 .RS 4
-Specify
-\fIcontent\fR
-as the Content\-Type\-string to be committed in a POST\-request\&.
+Specify \fIcontent\fR as the Content\-Type\-string to be committed
+in a POST\-request\&.
 The default MIME\-type is "application/x\-www\-form\-urlencoded"\&.
 .RE
 .PP
 \fB\-u\fR | \fB\-\-unlock\fR
 .RS 4
-Unlocks the target
-\fIurl\fR
-using an UNLOCK\-request\&. The token switch
-\fB\-t\fR
-is mandatory\&.
+Unlocks the target \fIurl\fR using an UNLOCK\-request\&.
+The token switch \fB\-t\fR is mandatory\&.
 .RE
 .PP
 \fB\-v\fR | \fB\-\-view\fR
 .RS 4
-Retrieve property information for
-\fIurl\fR
-by issuing a PROPFIND\-request\&. When used with the switch
-\fB\-g\fR, a restricted property set is retrieved\&.
+Retreive property information for \fIurl\fR by issuing a
+PROPFIND\-request\&. When used with the switch
+\fB\-g\fR, a restricted property set is retreived\&.
 .RE
 .PP
 \fB\-f\fR | \fB\-\-force\fR
 .RS 4
-Enforces an override for the requests MOVE and COPY, even if the target already exists\&.
+Enforces an override for the requests MOVE and COPY,
+even if the target already exists\&.
 .RE
 .PP
 \fB\-g\fR | \fB\-\-get\-prop\fR \fIname\fR
 .RS 4
-Specify the named property
-\fIname\fR
-in a PROPFIND\-request\&. This option restricts the outcome of the view\-switch
+Specify the named property \fIname\fR in a PROPFIND\-request\&.
+This option restricts the outcome of the view\-switch
 \fB\-v\fR\&.
 .RE
 .PP
 \fB\-r\fR | \fB\-\-recursive\fR
 .RS 4
-Set the execution depth to "Infinity", meaning infinite descent into the file tree\&.
+Set the execution depth to "Infinity", meaning infinite descent
+into the file tree\&.
 .RE
 .PP
 \fB\-a\fR | \fB\-\-auth\fR \fIrealm\fR
 .RS 4
-Specify authentication scope as
-\fIrealm\fR\&.
+Specify authentication scope as \fIrealm\fR\&.
 .RE
 .PP
 \fB\-A\fR | \fB\-\-proxy\-auth\fR \fIrealm\fR
 .RS 4
-Specify the proxy authentication scope as
-\fIrealm\fR\&.
+Specify the proxy authentication scope as \fIrealm\fR\&.
 .RE
 .PP
 \fB\-S\fR | \fB\-\-s\-expr\fR
@@ -230,18 +233,12 @@ The value of owner to present to the WebDAV\-server\&.
 \fBlibxml\fR(3)
 .SH "AUTHOR"
 .PP
-This text was first written by Mats Erik Andersson for the
-Debian GNU/Linux(TM) system, but may be used by others\&.
+This text was written by Mats Erik Andersson for the
+Debian GNU/Linux system, but may be used by others\&.
 Permission is granted to copy, distribute and/or modify
-this document under the terms of the
-European Union Public License, Version 1\&.1\&.
-.
-.SH "AUTHOR"
-.PP
-\fBMats Erik Andersson\fR
-.sp -1n
-.IP "" 4
-Author.
+this document under the terms of the European Union Public License,
+Version 1\&.1\&.
 .SH "COPYRIGHT"
-Copyright \(co 2009, 2010 Mats Erik Andersson
+.br
+Copyright \(co 2009 Mats Erik Andersson
 .br

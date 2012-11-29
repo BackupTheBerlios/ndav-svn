@@ -45,20 +45,21 @@ $(HANDBOK): $(DBKSOURCE)
 
 man/%.1: $(HANDBOK)
 	xsltproc --novalid \
-		--param			man.output.quietly			1		\
-		--param			man.output.in.separate.dir	1		\
-		--param			man.output.subdirs.enabled	0		\
-		--stringparam	man.output.base.dir			man/	\
-		--stringparam	man.output.encoding		$(KODNING)	\
-			$(DBK)/manpages/docbook.xsl $<
+		--stringparam man.output.encoding $(KODNING)	\
+		--stringparam man.output.base.dir man/	\
+		--param man.output.quietly 1		\
+		--param man.output.in.separate.dir 1	\
+		--param man.output.subdirs.enabled 0	\
+		--param man.authors.section.enabled 0	\
+		$(DBK)/manpages/docbook.xsl $<
 	@LANG=C perl -i -p -e 's#sv\.([1-8])#$$1#' man/*.sv.[1-8]
 	xsltproc --novalid \
-		--param			chunk.quietly		1		\
-		--param			use.id.as.filename	1		\
-		--stringparam	base.dir			xhtml/			\
-		--stringparam	chunker.output.encoding	$(KODNING)	\
-		--stringparam	html.stylesheet		$(NAME).css		\
-			$(DBK)/xhtml/chunk.xsl $<
+		--stringparam chunker.output.encoding $(KODNING) \
+		--stringparam base.dir xhtml/	\
+		--stringparam html.stylesheet $(NAME).css \
+		--param chunk.quietly 1		\
+		--param use.id.as.filename 1	\
+		$(DBK)/xhtml/chunk.xsl $<
 	@install -m 0644 ndav.css xhtml/$(NAME).css
 	@(which xmllint > /dev/null; \
 		if [ $$? -eq 0 ]; then \
