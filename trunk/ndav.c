@@ -15,6 +15,14 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#ifdef HAVE_SYS_CDEFS_H
+#include <sys/cdefs.h>
+#endif
+
+#ifndef __unused
+#define __unused
+#endif
+
 #include <stdio.h>
 #ifdef HAVE_STRING_H
 #include <string.h>
@@ -331,7 +339,7 @@ void * ndHTTPMethod( const char * URL,
 
 	if (auth && (auth->pauth_realm)) {
 		if ( snprintf(line, sizeof(line), "Basic realm=\"%s\"",
-						auth->pauth_realm) >= sizeof(line) )
+			      auth->pauth_realm) >= (int) sizeof(line) )
 			return NULL;
 			
 		if ( ndAuthCreateHeader(line, auth->auth_cb, &temp_buf, 1) < 0 )
@@ -345,7 +353,7 @@ void * ndHTTPMethod( const char * URL,
 
 	if (auth && (auth->auth_realm)) {
 		if ( snprintf(line, sizeof(line), "Basic realm=\"%s\"",
-					auth->auth_realm) >= sizeof(line) )
+					auth->auth_realm) >= (int) sizeof(line) )
 			return NULL;
 
 		if ( ndAuthCreateHeader(line, auth->auth_cb, &temp_buf, 0) < 0 )
@@ -424,7 +432,7 @@ int nd_dav_request( char * method,
 					ndAuthCtxtPtr auth,
 					const char * header,
 					const char * content,
-					int length,
+					int length __unused,
 					xmlBufferPtr * buf_return)
 {
 	int len, returnCode;
@@ -533,7 +541,7 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 
 	sprintf(depth_header, "Depth: %s\r\n", depth_str);
 	if ( snprintf(propfind_request, sizeof(propfind_request),
-				request_templ, ns, prop) >= sizeof(propfind_request) )
+				request_templ, ns, prop) >= (int) sizeof(propfind_request) )
 		return -1;
 
 	return nd_dav_request("PROPFIND", url, auth,
@@ -927,7 +935,7 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	if (lock_token) {
 		if ( snprintf(hstr, sizeof(hstr),
 					"If: <%s> (<%s>)\r\n", url, lock_token)
-				>= sizeof(hstr) )
+				>= (int) sizeof(hstr) )
 			return -1;
 	}
 	else
@@ -936,14 +944,14 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	if (value) {
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
 					update_string, prop, ns, value, prop)
-				>= sizeof(proppatch_request) )
+				>= (int) sizeof(proppatch_request) )
 			return -1;
 	} else {
 		/* No value at all. Submit a REMOVE. */
 
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
 					update_remove, prop, ns)
-				>= sizeof(proppatch_request) )
+				>= (int) sizeof(proppatch_request) )
 			return -1;
 	}
 
@@ -993,7 +1001,7 @@ int ndPut(char * url, ndAuthCtxtPtr auth, char * content, int length,
 	if (token)
 		if ( snprintf(if_header, sizeof(if_header),
 						"If: <%s> (<%s>)\r\n", url, token)
-				>= sizeof(if_header) )
+				>= (int) sizeof(if_header) )
 			return -1;
 
 	ctxt = ndHTTPMethod(url, auth, "PUT", content, NULL,
@@ -1118,7 +1126,7 @@ int ndDelete(char * url, ndAuthCtxtPtr auth, char * token) {
 	if (token)
 		if ( snprintf(if_header, sizeof(if_header),
 						"If: <%s> (<%s>)\r\n", url, token)
-				>= sizeof(if_header) )
+				>= (int) sizeof(if_header) )
 		
 			return -1;
 
@@ -1183,7 +1191,7 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 	}
 	if ( snprintf(lock_request, sizeof(lock_request),
 					locktype_string, scope_str, owner)
-			>= sizeof(lock_request) )
+			>= (int) sizeof(lock_request) )
 		return -1;
 
 	switch (depth) {
@@ -1198,7 +1206,7 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 	if (timeout) {
 		if ( snprintf(hstr, sizeof(hstr),
 					"Timeout: %s\r\nDepth: %s\r\n", timeout, depth_str)
-				>= sizeof(hstr) )
+				>= (int) sizeof(hstr) )
 			return -1;
 	} else
 		sprintf(hstr, "Depth: %s\r\n", depth_str);
@@ -1256,7 +1264,7 @@ int ndUnlock(char * url, ndAuthCtxtPtr auth, int	depth, char * token)
 		return -1;
 	if ( snprintf(hstr, sizeof(hstr),
 				"Lock-token: <%s>\r\nDepth: %s\r\n", token, depth_str)
-			>= sizeof(hstr) )
+			>= (int) sizeof(hstr) )
 		return -1;
 
 	ctxt = ndHTTPMethod(url, auth, "UNLOCK", NULL, NULL, hstr, 0);
@@ -1281,7 +1289,7 @@ int ndMkCol(char * url, ndAuthCtxtPtr auth, char * token) {
 	if (token)
 		if ( snprintf(if_header, sizeof(if_header),
 						"If: <%s> (<%s>)\r\n", url, token)
-				>= sizeof(if_header) )
+				>= (int) sizeof(if_header) )
 			return -1;
 
 	ctxt = ndHTTPMethod(url, auth, "MKCOL", NULL, NULL,
@@ -1377,13 +1385,13 @@ int ndMove(char * url, ndAuthCtxtPtr auth, char * dest_url,
 	if ( snprintf(hstr, sizeof(hstr),
 				"Destination: %s\r\nOverwrite: %c\r\n", dest_url,
 				overwrite ? 'T' : 'F')
-			>= sizeof(hstr) )
+			>= (int) sizeof(hstr) )
 		return -1;
 
 	if (lock_token) {
 		if ( snprintf(hstr_1, sizeof(hstr_1),
 					"If: <%s> (<%s>)\r\n", dest_url, lock_token)
-				>= sizeof(hstr_1) )
+				>= (int) sizeof(hstr_1) )
 
 			return -1;
 			if ( (strlen(hstr) + strlen(hstr_1) + 1)
@@ -1413,13 +1421,13 @@ int ndCopy(char * url, ndAuthCtxtPtr auth, char * dest_url,
 		return -1;
 	if ( snprintf(hstr, sizeof(hstr),
 				"Destination: %s\r\nOverwrite: %c\r\n", dest_url,
-				overwrite ? 'T' : 'F') >= sizeof(hstr) )
+				overwrite ? 'T' : 'F') >= (int) sizeof(hstr) )
 		return -1;
 
 	if (lock_token) {
 			if ( snprintf(hstr_1, sizeof(hstr_1),
 						"If: <%s> (<%s>)\r\n", dest_url, lock_token)
-					>= sizeof(hstr_1) )
+					>= (int) sizeof(hstr_1) )
 				return -1;
 
 			if ( (strlen(hstr) + strlen(hstr_1) + 1)

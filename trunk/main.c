@@ -15,6 +15,14 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#ifdef HAVE_SYS_CDEFS_H
+#include <sys/cdefs.h>
+#endif
+
+#ifndef __unused
+#define __unused
+#endif
+
 #include "ndav.h"
 
 #include <stdarg.h>
@@ -41,9 +49,9 @@
 static int format = ND_PRINT_AS_HEADER;
 static int debug = 0;
 
-const static char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:";
+static const char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:";
 
-const static struct option long_options[] = {
+static const struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
 	{"put",		required_argument, 0, 'p'},
 	{"move",	required_argument, 0, 'm'},
@@ -194,7 +202,7 @@ int authenticate( ndAuthParamPtr param, int is_proxy) {
 
 #undef WAIT_FOR_END
 
-void null_error_handler(void *ctx, const char *msg, ...) {
+void null_error_handler(void *ctx __unused, const char *msg __unused, ...) {
 	/* Empty */
 }; /* null_error_handler(...) */
 

@@ -36,7 +36,7 @@
 #define SKIP_BLANKS(p) { while (*(p)&&isspace(*(p))) (p)++; }
 
 /* Reused from mimehead.c */
-const static char Base64Table[] =
+static const char Base64Table[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
 extern const char *export_method;
@@ -302,7 +302,7 @@ xmlBufferPtr ndAuthEncodeBasic(char *a) {
 
 xmlBufferPtr ndAuthEncodeDigest(xmlBufferPtr a) {
 #if HAVE_MHASH_H && USE_DIGEST
-	int j;
+	unsigned int j;
 	char octet[3];
 	unsigned char hash[16];
 	MHASH context;
