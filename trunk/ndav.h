@@ -4,7 +4,7 @@
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.
  *
- * Copyright (c) 2009 Mats Erik Andersson <mats.andersson@gisladiske.se>
+ * Copyright (c) 2009, 2012 Mats Erik Andersson <meand@users.berlios.de>
  *
  * $Id$
  *
@@ -215,6 +215,7 @@ extern int ndPropFind(char * url,
 				char * prop,
 				char * ns,
 				int depth,
+				int detect,
 				ndNodeInfoPtr * ni_return);
 
 extern int ndPropPatch(char * url,

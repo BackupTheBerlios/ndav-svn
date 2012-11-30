@@ -8,8 +8,8 @@
 
 	<!ENTITY fnamn		"<firstname>Mats Erik</firstname>">
 	<!ENTITY enamn		"<surname>Andersson</surname>">
-	<!ENTITY datum-en	"<date>September 11th, 2009</date>">
-	<!ENTITY datum-sv	"<date>11:e september 2009</date>">
+	<!ENTITY datum-en	"<date>December 1st, 2012</date>">
+	<!ENTITY datum-sv	"<date>1:a december 2012</date>">
 	<!ENTITY epost		"<email>meand@users.berlios.de</email>">
 	<!ENTITY namn		"Mats Erik Andersson">
 
@@ -40,7 +40,7 @@
 					&enamn;
 				</author>
 				<copyright>
-					<year>2009</year>
+					<year>2012</year>
 					<holder>&namn;</holder>
 				</copyright>
 				&datum-sv;
@@ -345,6 +345,20 @@
 					</varlistentry>
 					<varlistentry>
 						<term>
+							<option>-n</option> | <option>--prop-name</option>
+						</term>
+						<listitem>
+							<para>
+								Inhämta alla egenskapsnamn för målet
+								<replaceable
+									class="option">url</replaceable>.
+								Egenskapernas värde hämtas ej, men
+								deras namnområden påvisas.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
 							<option>-v</option> | <option>--view</option>
 						</term>
 						<listitem>
@@ -515,7 +529,7 @@
 					&enamn;
 				</author>
 				<copyright>
-					<year>2009</year>
+					<year>2012</year>
 					<holder>&namn;</holder>
 				</copyright>
 				&datum-en;
@@ -810,6 +824,20 @@
 									class="option">url</replaceable>
 								using an UNLOCK-request. The token switch
 								<option>-t</option> is mandatory.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-n</option> | <option>--prop-name</option>
+						</term>
+						<listitem>
+							<para>
+								Retreive all property names for
+								<replaceable
+									class="option">url</replaceable>.
+								Their values are not stated, but their
+								corresponding name spaces are.
 							</para>
 						</listitem>
 					</varlistentry>

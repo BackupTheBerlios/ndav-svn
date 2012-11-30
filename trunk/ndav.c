@@ -4,7 +4,7 @@
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.
  *
- * Copyright (c) 2009 Mats Erik Andersson <mats.andersson@gisladiske.se>
+ * Copyright (c) 2009, 2012 Mats Erik Andersson <meand@users.berlios.de>
  *
  * $Id$
  *
@@ -478,6 +478,33 @@ int nd_dav_request( char * method,
 }; /* nd_dav_request(...) */
 
 /*
+ * PROPFIND(PROPNAME)
+ */
+int nd_propfind_propname_query(char * url, ndAuthCtxtPtr auth,
+						 int depth, xmlBufferPtr * buf_return)
+{
+	char * depth_str = NULL;
+	char depth_header[ND_HEADER_LINE_MAX];
+	const char * verboseQuery =
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+		"<D:propfind xmlns:D=\"DAV:\"><D:propname/></D:propfind>\n";
+
+	switch (depth) {
+		case ND_DEPTH_0:	depth_str = "0";
+							break;
+		case ND_DEPTH_1:	depth_str = "1";
+							break;
+		case ND_DEPTH_INFINITE:	depth_str = "Infinity";
+								break;
+	}
+
+	sprintf(depth_header, "Depth: %s\r\n", depth_str);
+	return nd_dav_request("PROPFIND", url, auth,
+						 depth_header, verboseQuery,
+						 strlen(verboseQuery), buf_return);
+}; /* nd_propfind_propname_query(char *, ndAuthCtxtPtr, int, xmlBufferPtr *) */
+
+/*
  * PROPFIND(ALLPROP)
  */
 int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
@@ -871,14 +898,17 @@ ndNodeInfoPtr nd_parse_multistatus(xmlNodePtr cur) {
 }; /* nd_parse_multistatus(xmlNodePtr cur) */
 
 int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
-				char * ns, int depth, ndNodeInfoPtr * ni_return)
+				char * ns, int depth, int detect,
+				ndNodeInfoPtr * ni_return)
 {
 	int code;
 	ndNodeInfoPtr ret;
 	xmlDocPtr doc;
 	xmlBufferPtr buf = NULL;
 
-	if (prop == NULL)
+	if (detect)
+		code = nd_propfind_propname_query(url, auth, depth, &buf);
+	else if (prop == NULL)
 		code = nd_propfind_all_query(url, auth, depth, &buf);
 	else
 		code = nd_propfind_query(url, auth, prop, ns, depth, &buf);

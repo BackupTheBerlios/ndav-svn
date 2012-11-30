@@ -1,3 +1,12 @@
+2012-12-01	Mats Erik Andersson <meand@users.berlios.de>
+
+	* main.c (long_options): New option `-n/--prop-name'.
+	(main): New mode 'n' corresponding to `--prop-name'.
+	* ndav.c (nd_propfind_propname_query): New function.
+	(ndPropFind): New signature. If `detect' is true,
+	then call nd_propfind_propname_query().
+	* ndav.h (ndPropFind): Updated.
+
 2012-11-30	Mats Erik Andersson <meand@users.berlios.de>
 
 	* Fuller adaptions for autotools. Remove all helper

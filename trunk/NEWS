@@ -15,3 +15,7 @@
 
 	* Release of ndav-0.2.1.
 	* Improved autotools implementation.
+
+2012-12-01
+
+	* New access method PROPFIND(propname).

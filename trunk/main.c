@@ -4,7 +4,7 @@
  * Copyright (c) 2002 Yuuichi Teranishi <teranisi@gohome.org>
  * For license terms, see the file COPYING in this directory.
  *
- * Copyright (C) 2009 Mats Erik Andersson <meand@user.berlios.de>
+ * Copyright (C) 2009, 2012 Mats Erik Andersson <meand@users.berlios.de>
  *
  * $Id$
  *
@@ -49,7 +49,7 @@
 static int format = ND_PRINT_AS_HEADER;
 static int debug = 0;
 
-static const char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:V";
+static const char optstring[] = "a:c:de:fg:hi:klm:no:p:qrs:t:uvA:DN:P:ST:V";
 
 static const struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
@@ -63,6 +63,7 @@ static const struct option long_options[] = {
 	{"content-type",	required_argument, 0, 'T'},
 	{"force",	no_argument, 0, 'f'},
 	{"view",	no_argument, 0, 'v'},
+	{"prop-name",	no_argument, 0, 'n'},
 	{"lock",	no_argument, 0, 'l'},
 	{"unlock",	no_argument, 0, 'u'},
 	{"recursive",	no_argument, 0, 'r'},
@@ -103,50 +104,53 @@ void error_exit(int format, const char *fmt, ...) {
 }; /* error_exit(...) */
 
 #define NDAV_SHORT_USAGE "%s version %s\n"		\
-	"usage: %s [-AacdegiklmNoPpqrSsTtuVv] url\n\n"	\
+	"usage: %s [-AacdegiklmNnoPpqrSsTtuVv] url\n\n"	\
 	"Without options, a GET is implied.\n"
 
 #define ND_USAGE "%s version %s\n"\
 	"usage: %s [options] url\n\n"\
 	"If no option is given, the http-action GET is implied.\n\n\
 	-c|--copy-to <dest_url>\n\
-		COPY url to the dest_url.\n\
+		COPY url to the 'dest_url'.\n\
 		(Not yet implemented.)\n\
 	-v|--view\n\
 		View property information of url by PROPFIND.\n\
 		With option '-g', only the specified property is displayed.\n\
+	-n|--prop-name\n\
+		Retreive all available property names of the specified url.\n\
+		This displays properties without value, but with name space.\n\
 	-q|--quiet\n\
 		Print quietly: only properties, no headers.\n\
 	-p|--put-file <file>\n\
 		Write file content to the url by PUT.\n\
-		Use lock token if -t is specified. \n\
+		Uses a lock token if also '-t' is specified. \n\
 	-g|--get-prop <name>\n\
-		Specify the property name for -v option.\n\
+		Specify the property name for option '-v'.\n\
 	-e|--edit-prop <name=value>\n\
 		Edit the property 'name'. Its value is changed to 'value'.\n\
 		When multiple '-e' options are specified, only the first\n\
 		one takes effect.\n\
 		A namespace marker '-N' is required if the namespace of the\n\
-		property is something other than 'DAV:'\n\
+		property is something other than 'DAV:'.\n\
 	-N|--namespace <namespace-url>\n\
-		Specify the property namespace URL for -e or -g option.\n\
+		Specify the property namespace URL for '-e' or '-g' option.\n\
 	-P|--post <file>\n\
-		POST file content to the url. -T is required.\n\
+		POST file content to the url. Option '-T' is required.\n\
 	-T|--content-type <content_type>\n\
 		Use content_type as a Content-Type of the POST request.\n\
 		Default is `application/x-www-form-urlencoded'.\n\
 	-d|--delete\n\
-		DELETE url. Use lock token if -t is specified. \n\
+		DELETE url. Use a lock token if also '-t' is specified. \n\
 	-l|--lock\n\
 		LOCK url.\n\
 	-k|--mkcol\n\
 		MKCOL url.\n\
 	-m|--move <dest_url>\n\
-		MOVE url to the dest_url. (Not yet implemented.)\n\
+		MOVE url to the 'dest_url'. (Not yet implemented.)\n\
 	-o|--owner <owner>\n\
 		Specify lock owner. Default is USER environment variable.\n\
 	-r|--recursive\n\
-		Execute operation by setting depth as infinity.\n\
+		Execute operation by setting depth to infinity.\n\
 		(Not yet implemented.)\n\
 	-a|--auth <realm>\n\
 		Specify authentication realm for the request.\n\
@@ -158,7 +162,7 @@ void error_exit(int format, const char *fmt, ...) {
 	-i|--timeout <timeout>\n\
 		Specify lock timeout interval. Default is `Infinite'.\n\
 	-u|--unlock\n\
-		UNLOCK url. -t option is required.\n\
+		UNLOCK url. The option '-t' is required.\n\
 	-t|--token <token>\n\
 		Use lock token `token'.\n\
 	-S|--s-expr\n\
@@ -271,6 +275,8 @@ int main(int argc, char * argv[]) {
 						scope = ND_LOCK_SCOPE_EXCLUSIVE;
 						break;
 			case 'i':	timeout = optarg;
+						break;
+			case 'n':	mode = 'n';
 						break;
 			case 'o':	owner = optarg;
 						break;
@@ -430,6 +436,7 @@ int main(int argc, char * argv[]) {
 #endif /* WAIT_FOR_END */
 					};
 					break;
+		case 'n':
 		case 'v':	{
 						ndNodeInfoPtr ret = NULL;
 						int code;
@@ -444,7 +451,9 @@ int main(int argc, char * argv[]) {
 											: ND_DEPTH_1 )
 									: ND_DEPTH_0;
 
-						code = ndPropFind(url, auth, prop, ns, depth, &ret);
+						code = ndPropFind(url, auth, prop, ns, depth,
+										  (mode == 'n') ? 1 : 0,
+										  &ret);
 						ndFreeAuthCtxt(auth);
 	
 						if (ret)
