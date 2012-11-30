@@ -1,8 +1,9 @@
-2012-11-29	Mats Erik Andersson <meand@users.berlios.de>
+2012-11-30	Mats Erik Andersson <meand@users.berlios.de>
 
-	* Fuller adaptions for autotools.
-
+	* Fuller adaptions for autotools. Remove all helper
+	  files that are generated.
 	* Rebuilt manual pages.
+	* Release as 0.2.1.
 
 2010-06-16	Mats Erik Andersson <meand@users.berlios.de>
 

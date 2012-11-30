@@ -10,3 +10,8 @@
 
 	* Release of ndav-0.2.0.
 	* Authentication using digests has now been added.
+
+2012-11-30
+
+	* Release of ndav-0.2.1.
+	* Improved autotools implementation.

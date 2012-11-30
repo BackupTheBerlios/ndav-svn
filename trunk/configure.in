@@ -3,13 +3,13 @@
 PACKAGE=ndav
 MAJOR_VERSION=0
 MINOR_VERSION=2
-MICRO_VERSION=0
+MICRO_VERSION=1
 #INTERFACE_AGE=6
 BINARY_AGE=0
 
 VERSION=$MAJOR_VERSION.$MINOR_VERSION.$MICRO_VERSION
 
-AC_INIT([ndav], [0.2.0], [meand@users.berlios.de], ,
+AC_INIT([ndav], [0.2.1], [meand@users.berlios.de], ,
 	[http://developer.berlios.de/projects/ndav/])
 
 AC_CANONICAL_SYSTEM
