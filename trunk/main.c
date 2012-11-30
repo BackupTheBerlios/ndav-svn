@@ -49,7 +49,7 @@
 static int format = ND_PRINT_AS_HEADER;
 static int debug = 0;
 
-static const char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:";
+static const char optstring[] = "c:de:fg:hi:lm:o:vukqrs:t:p:a:A:ST:P:DN:V";
 
 static const struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
@@ -77,6 +77,7 @@ static const struct option long_options[] = {
 	{"auth",	required_argument, 0, 'a'},
 	{"proxy-auth",	required_argument, 0, 'A'},
 	{"quiet",	no_argument,	0,	'q'},
+	{"version",	no_argument,	0,	'V'},
 	{0, 0, 0, 0}
 };
 
@@ -98,12 +99,16 @@ void error_exit(int format, const char *fmt, ...) {
 		}
 	}
 	va_end(ap);
-	exit(1);
+	exit(EXIT_FAILURE);
 }; /* error_exit(...) */
 
-#define ND_USAGE "%s version %s\n\
-usage: %s [options] url\n\n\
-	If no option is given, the http-action GET is implied.\n\n\
+#define NDAV_SHORT_USAGE "%s version %s\n"		\
+	"usage: %s [-AacdegiklmNoPpqrSsTtuVv] url\n\n"	\
+	"Without options, a GET is implied.\n"
+
+#define ND_USAGE "%s version %s\n"\
+	"usage: %s [options] url\n\n"\
+	"If no option is given, the http-action GET is implied.\n\n\
 	-c|--copy-to <dest_url>\n\
 		COPY url to the dest_url.\n\
 		(Not yet implemented.)\n\
@@ -159,7 +164,23 @@ usage: %s [options] url\n\n\
 	-S|--s-expr\n\
 		Print output by s-expression.\n\
 	-D|--debug\n\
-		Debug mode.\n"
+		Debug mode.\n\
+	-V|--version\n\
+		Print version.\n"
+
+void print_version(char * prog) {
+	fprintf(stdout,
+			"%s version %s, with Basic"
+#ifdef USE_DIGEST
+			" and Digest"
+#endif /* USE_DIGEST */
+			" authentication.\n",
+			basename(prog), VERSION);
+}; /* print_version(char *) */
+
+void short_usage(char * prog) {
+	fprintf(stderr, NDAV_SHORT_USAGE, PACKAGE, VERSION, basename(prog));
+}; /* short_usage(char *) */
 
 void usage(char * prog) {
 	fprintf(stderr, ND_USAGE, PACKAGE, VERSION, basename(prog));
@@ -180,11 +201,12 @@ void auth_notify(void * ctxt) {
 int authenticate( ndAuthParamPtr param, int is_proxy) {
 	char user[ND_HEADER_LINE_MAX];
 	char *realm = ndAuthParamValue(param, "realm");
+	char *name = ndAuthParamValue(param, "name");
 
 	if (realm) {
-		fprintf(stderr, "%sUsername for %s: ",
-						is_proxy ? "Proxy " : "",
-						realm);
+		fprintf(stderr, "%sUsername for %s realm \"%s\": ",
+				is_proxy ? "Proxy " : "",
+				name, realm);
 
 		if ( fgets(user, ND_HEADER_LINE_MAX, stdin) == NULL )
 			return -1;
@@ -194,7 +216,7 @@ int authenticate( ndAuthParamPtr param, int is_proxy) {
 
 		ndAuthParamSetValue(param, "user", user);
 		ndAuthParamSetValue(param, "password",
-		getpass(is_proxy ? "Proxy Password: " : "Password: "));
+				getpass(is_proxy ? "Proxy Password: " : "Password: "));
 		return 0;
 	}
 	return -1;
@@ -289,10 +311,16 @@ int main(int argc, char * argv[]) {
 			case 'p':	mode = 'p';
 						infile = optarg;
 						break;
-			case 'h':	/* Help and catch-all. */
-			case '?':
-			default:	usage(argv[0]);
-						exit(1);
+			case 'V':	print_version(argv[0]);
+						exit(EXIT_SUCCESS);
+						break;
+			case 'h':	/* Long help. */
+						usage(argv[0]);
+						exit(EXIT_FAILURE);
+						break;
+			case '?':	/* Short help and catch-all. */
+			default:	short_usage(argv[0]);
+						exit(EXIT_FAILURE);
 						break;
 		}
 	}
@@ -300,8 +328,9 @@ int main(int argc, char * argv[]) {
 	url = argv[optind];
 
 	if (url == NULL) {
-		usage(argv[0]);
-		exit(1);
+		fprintf(stderr, "%s: No target URL was specified.\n",
+				basename(argv[0]));
+		exit(EXIT_FAILURE);
 	}
 
 	auth = ndCreateAuthCtxt(authenticate, auth_notify,

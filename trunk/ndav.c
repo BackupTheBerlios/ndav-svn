@@ -338,8 +338,9 @@ void * ndHTTPMethod( const char * URL,
 		return NULL;
 
 	if (auth && (auth->pauth_realm)) {
-		if ( snprintf(line, sizeof(line), "Basic realm=\"%s\"",
-			      auth->pauth_realm) >= (int) sizeof(line) )
+		if ( snprintf(line, sizeof(line), "%s realm=\"%s\"",
+					  auth->pauth_type, auth->pauth_realm)
+				>= (int) sizeof(line) )
 			return NULL;
 			
 		if ( ndAuthCreateHeader(line, auth->auth_cb, &temp_buf, 1) < 0 )
@@ -352,8 +353,9 @@ void * ndHTTPMethod( const char * URL,
 	}
 
 	if (auth && (auth->auth_realm)) {
-		if ( snprintf(line, sizeof(line), "Basic realm=\"%s\"",
-					auth->auth_realm) >= (int) sizeof(line) )
+		if ( snprintf(line, sizeof(line), "%s realm=\"%s\"",
+					  auth->auth_type, auth->auth_realm)
+				>= (int) sizeof(line) )
 			return NULL;
 
 		if ( ndAuthCreateHeader(line, auth->auth_cb, &temp_buf, 0) < 0 )

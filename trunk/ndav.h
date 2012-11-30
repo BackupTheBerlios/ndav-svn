@@ -184,8 +184,10 @@ typedef struct _nd_auth_ctxt
 {
 	ndAuthCallback auth_cb;
 	ndAuthNotifyCallback notify_cb;
-	char * auth_realm;	/* Authentication Realm */
-	char * pauth_realm; /* Proxy Authentication Realm */
+	char * auth_realm;	/* Authentication realm. */
+	char * auth_type;	/* Type of authentication.  */
+	char * pauth_realm; /* Proxy authentication realm.  */
+	char * pauth_type;	/* Type of proxy authentication.  */
 } ndAuthCtxt, * ndAuthCtxtPtr;
 
 extern ndAuthCtxtPtr ndCreateAuthCtxt(ndAuthCallback auth_cb, 

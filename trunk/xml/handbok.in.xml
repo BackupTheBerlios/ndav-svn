@@ -108,6 +108,16 @@
 					</varlistentry>
 					<varlistentry>
 						<term>
+							<option>-V</option> | <option>--version</option>
+						</term>
+						<listitem>
+							<para>
+								Versionsupplysning.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
 							<option>-c</option> | <option>--copy-to</option>
 							<replaceable
 								class="option">mål-url</replaceable>
@@ -568,6 +578,16 @@
 						<listitem>
 							<para>
 								Shows a summary of available options.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>
+							<option>-V</option> | <option>--version</option>
+						</term>
+						<listitem>
+							<para>
+								Version information.
 							</para>
 						</listitem>
 					</varlistentry>

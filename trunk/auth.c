@@ -475,7 +475,9 @@ ndCreateAuthCtxt(ndAuthCallback auth_cb, ndAuthNotifyCallback notify_cb,
 	auth->auth_cb = auth_cb;
 	auth->notify_cb = notify_cb;
 	auth->auth_realm = auth_realm;
+	auth->auth_type = "Basic";
 	auth->pauth_realm = pauth_realm;
+	auth->pauth_type = "Basic";
 
 	return auth;
 }; /* ndCreateAuthCtxt(...) */
