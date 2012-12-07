@@ -269,19 +269,22 @@ void ndPropPrint(FILE * fp, ndPropPtr prop, int format) {
 		if (prop->name) {
 			if ( NDAV_PRINT_VERBOSELY(format) )
 				fprintf(fp, "Property: ");
-			if (prop->value && *prop->value == '\"')
+			if ( NDAV_PRINT_NAMEONLY(format) )
+				fprintf(fp, "%s", prop->name);
+			else if (prop->value && *prop->value == '\"')
 				fprintf(fp, "%s=%s", prop->name, prop->value);
 			else if (prop->value)
 				fprintf(fp, "%s=\"%s\"", prop->name, prop->value);
 		}
 		if (prop->ns)
-			fprintf(fp, "; ns=\"%s\"\n", prop->ns);
-		else
-			fprintf(fp, "\n");
+			fprintf(fp, "; ns=\"%s\"", prop->ns);
+		fprintf(fp, "\n");
 	} else if ( NDAV_PRINT_SEXP(format) ) {
 		fprintf(fp, "(property");
 		fprintf(fp, " (name \"%s\")", prop->name ? prop->name : "");
-		if (prop->value && *prop->value == '\"')
+		if ( NDAV_PRINT_NAMEONLY(format) )
+			;
+		else if (prop->value && *prop->value == '\"')
 			fprintf(fp, " (value %s)", prop->value);
 		else
 			fprintf(fp, " (value \"%s\")",

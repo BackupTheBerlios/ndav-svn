@@ -89,7 +89,7 @@
 					hämta det uppgivna målet, en rättfram GET-förfrågan.
 				</para>
 				<para>
-					Avsikten är att hela Webdav-standarden, RFC 2518,
+					Avsikten är att hela Webdav-standarden, RFC 4918,
 					skall uppfyllas av detta verktyg.
 				</para>
 			</refsect1>
@@ -579,7 +579,7 @@
 				</para>
 				<para>
 					This utility intends to implement the complete
-					WebDAV standard as expressed in RFC 2518.
+					WebDAV standard as expressed in RFC 4918.
 				</para>
 			</refsect1>
 			<refsect1>

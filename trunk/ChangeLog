@@ -1,5 +1,15 @@
 2012-12-01	Mats Erik Andersson <meand@users.berlios.de>
 
+	* main.c (usage): Direct output to stdout.
+	(main) <'n'>: Set format to ND_PRINT_NAMEONLY.
+	(main) <'h'>: Exit with EXIT_SUCCESS.
+	* ndav.h (ND_PRINT_NAMEONLY, NDAV_PRINT_NAMEONLY):
+	New macros.
+	* ndav.c (ndPropPrint): Add a check of NDAV_PRINT_NAMEONLY
+	for outputting only property names.
+
+2012-12-01	Mats Erik Andersson <meand@users.berlios.de>
+
 	* main.c (long_options): New option `-n/--prop-name'.
 	(main): New mode 'n' corresponding to `--prop-name'.
 	* ndav.c (nd_propfind_propname_query): New function.

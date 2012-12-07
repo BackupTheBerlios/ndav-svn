@@ -187,7 +187,7 @@ void short_usage(char * prog) {
 }; /* short_usage(char *) */
 
 void usage(char * prog) {
-	fprintf(stderr, ND_USAGE, PACKAGE, VERSION, basename(prog));
+	fprintf(stdout, ND_USAGE, PACKAGE, VERSION, basename(prog));
 }; /* usage(char *) */
 
 void auth_notify(void * ctxt) {
@@ -277,6 +277,7 @@ int main(int argc, char * argv[]) {
 			case 'i':	timeout = optarg;
 						break;
 			case 'n':	mode = 'n';
+						format |= ND_PRINT_NAMEONLY;
 						break;
 			case 'o':	owner = optarg;
 						break;
@@ -322,7 +323,7 @@ int main(int argc, char * argv[]) {
 						break;
 			case 'h':	/* Long help. */
 						usage(argv[0]);
-						exit(EXIT_FAILURE);
+						exit(EXIT_SUCCESS);
 						break;
 			case '?':	/* Short help and catch-all. */
 			default:	short_usage(argv[0]);
