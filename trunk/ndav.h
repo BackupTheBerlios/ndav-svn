@@ -133,6 +133,8 @@ typedef struct _nd_node_info
 	char * date;
 	char * cdate;
 	char * content;
+	char * etag;
+	char * lang;
 	char * restype;
 	int status;
 	ndPropPtr props;

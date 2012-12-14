@@ -1,3 +1,29 @@
+2012-12-14	Mats Erik Andersson <meand@users.berlios.de>
+
+	Better standard compliance with live properties and
+	for namespace selectors.
+
+	* ndav.c (live_dav_prop): New structure.
+	(live_dav_props): New array.
+	(is_live_dav_prop): New function.
+	(ndNodeInfoPrint): Always print "Name" entry.  New entries
+	for "ETag" and "Lang".  New non-verbose mode prints only
+	those entries which have a non-empty value.
+	(ndav_get_creationdate, ndav_get_resourcetype)
+	(ndav_get_contentlanguage, ndav_get_contentlength)
+	(ndav_get_contenttype, ndav_get_etag, ndav_get_lastmodified)
+	(ndav_get_lockdiscovery): New helper functions.
+	(nd_propfind_query): Rewrite template "request_templ" to allow
+	better exact namespace use of "xmlns:D".  Use "DAV:" only
+	for live properties.
+	(ndPropPatch): Likewise with templates "update_string" and
+	"update_remove".
+	(nd_parse_prop): Use a loop over "live_dav_props", not if-blocks.
+	* ndav.h (struct _nd_node_info): New members "etag" and "lang".
+
+	* main.c (ND_USAGE): Reorder text for better understanding.
+	Update some outdated description claims.
+
 2012-12-01	Mats Erik Andersson <meand@users.berlios.de>
 
 	* main.c (usage): Direct output to stdout.

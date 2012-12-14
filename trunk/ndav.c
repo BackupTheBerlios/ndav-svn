@@ -39,8 +39,56 @@
 
 #include "ndav.h"
 
+struct live_dav_prop {
+	char *prop;
+	int protected;
+	void (*action)(xmlNodePtr, ndNodeInfoPtr);
+};
+
 const char *export_method = "";
 const char *export_uri = "";
+
+void ndav_get_creationdate(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_resourcetype(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_contentlanguage(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_contentlength(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_contenttype(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_etag(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_lastmodified(xmlNodePtr, ndNodeInfoPtr);
+void ndav_get_lockdiscovery(xmlNodePtr, ndNodeInfoPtr);
+
+ndLockInfoPtr nd_parse_lockdiscovery(xmlNodePtr);
+
+struct live_dav_prop live_dav_props[] = {
+		/* General properties. */
+	{ "creationdate", 1, ndav_get_creationdate },
+	{ "displayname", 0, /* not implemented */ NULL },
+	{ "resourcetype", 1, ndav_get_resourcetype },
+		/* For retreivable objects. */
+	{ "getcontentlanguage", 0, ndav_get_contentlanguage },
+	{ "getcontentlength", 1, ndav_get_contentlength },
+	{ "getcontenttype", 1, ndav_get_contenttype },
+	{ "getetag", 1, ndav_get_etag },
+	{ "getlastmodified", 1, ndav_get_lastmodified },
+		/* Locking properties. */
+	{ "lockdiscovery", 1, ndav_get_lockdiscovery },
+	{ "source", 1, /* not implemented, only RFC 2518 */ NULL },
+	{ "supportedlock", 1, /* not implemented */ NULL },
+		/* End marker. */
+	{ NULL, 0, NULL }
+}; /* live_dav_props */
+
+int
+is_live_dav_prop(const char *prop)
+{
+	struct live_dav_prop *ldp;
+
+	for (ldp = live_dav_props; ldp->prop; ldp++)
+		if ( !strcmp(ldp->prop, prop) && ldp->action )
+			return 1;
+
+	return 0;
+}; /* is_live_dav_prop(const char *) */
 
 ndNodeInfoPtr ndNodeInfoNew() {
 	ndNodeInfoPtr ret = xmlMalloc(sizeof(ndNodeInfo));
@@ -86,17 +134,37 @@ void ndNodeInfoPrint(FILE * fp, ndNodeInfoPtr info, int format) {
 	if ( ! NDAV_PRINT_SEXP(format) ) {
 		if (info == NULL)
 			return;
+		fprintf(fp, "Name: %s\n", info->name ? info->name : "");
 		if ( NDAV_PRINT_VERBOSELY(format) ) {
-			fprintf(fp, "Name: %s\n", info->name ? info->name : "");
 			fprintf(fp, "Status: %d\n", info->status);
 			fprintf(fp, "Last-Modified: %s\n", info->date ? info->date : "");
 			fprintf(fp, "Created: %s\n", info->cdate ? info->cdate : "");
+			fprintf(fp, "ETag: %s\n", info->etag ? info->etag : "");
 			fprintf(fp, "Size: %s\n", info->size ? info->size : "");
 			fprintf(fp, "Content-Type: %s\n",
 					info->content ? info->content : "");
+			fprintf(fp, "Lang: %s\n", info->lang ? info->lang : "");
 			fprintf(fp, "Resource-Type: %s\n",
 					info->restype ? info->restype : "");
-		}; /* Print verbosely. */
+		} else {
+			if (info->status)
+				fprintf(fp, "Status: %d\n", info->status);
+			if (info->date)
+				fprintf(fp, "Last-Modified: %s\n", info->date);
+			if (info->cdate)
+				fprintf(fp, "Created: %s\n", info->cdate);
+			if (info->etag)
+				fprintf(fp, "ETag: %s\n", info->etag);
+			if (info->size)
+				fprintf(fp, "Size: %s\n", info->size);
+			if (info->content)
+				fprintf(fp, "Content-Type: %s\n", info->content);
+			if (info->lang)
+				fprintf(fp, "Lang: %s\n", info->lang);
+			if (info->restype)
+				fprintf(fp, "Resource-Type: %s\n", info->restype);
+		}
+
 		if (info->props)
 			ndPropListPrint(fp, info->props, format);
 		if (info->lock)
@@ -480,6 +548,39 @@ int nd_dav_request( char * method,
 	return returnCode;
 }; /* nd_dav_request(...) */
 
+void ndav_get_creationdate(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->cdate = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_creationdate(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_resourcetype(xmlNodePtr cur, ndNodeInfoPtr node) {
+	if (cur->children != NULL)
+		node->restype = xmlMemStrdup((char *) cur->children->name);
+}; /* ndav_get_resourcetype(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_contentlanguage(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->lang = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_contentlanguage(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_contentlength(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->size = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_contentlength(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_contenttype(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->content = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_contenttype(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_etag(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->etag = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_etag(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_lastmodified(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->date = (char *) xmlNodeGetContent(cur);
+}; /* ndav_get_lastmodified(xmlNodePtr, ndNodeInfoPtr) */
+
+void ndav_get_lockdiscovery(xmlNodePtr cur, ndNodeInfoPtr node) {
+	node->lock = nd_parse_lockdiscovery(cur);
+}; /* ndav_get_lockdiscovery(xmlNodePtr, ndNodeInfoPtr) */
+
 /*
  * PROPFIND(PROPNAME)
  */
@@ -489,7 +590,7 @@ int nd_propfind_propname_query(char * url, ndAuthCtxtPtr auth,
 	char * depth_str = NULL;
 	char depth_header[ND_HEADER_LINE_MAX];
 	const char * verboseQuery =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\"><D:propname/></D:propfind>\n";
 
 	switch (depth) {
@@ -516,7 +617,7 @@ int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
 	char * depth_str = NULL;
 	char depth_header[ND_HEADER_LINE_MAX];
 	const char * verboseQuery =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\"><D:allprop/></D:propfind>\n";
 
 	switch (depth) {
@@ -550,17 +651,26 @@ int
 nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 					 char * ns, int depth, xmlBufferPtr * buf_return)
 {
+	int live_prop = 0;
 	char * depth_str = NULL;
 	char depth_header[ND_HEADER_LINE_MAX];
 	char propfind_request[ND_REQUEST_MAX];
-	const char request_templ[] =	
+	char namespace[ND_REQUEST_MAX] = "";
+
+	const char *namespace_templ = " xmlns:ns=\"%s\"";
+	const char *request_templ =	
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\">\n"
-		"\t<D:prop xmlns:ns=\"%s\"><ns:%s/></D:prop>\n"
+		"\t<D:prop%s><%s%s/></D:prop>\n"
 		"</D:propfind>\n";
 
-	if (ns == NULL)
-		ns = "DAV:";
+	if (ns && *ns) {
+		if ( snprintf(namespace, sizeof(namespace),
+					  namespace_templ, ns)
+			 >= (int) sizeof(namespace))
+			return -1;
+	} else
+		live_prop = is_live_dav_prop(prop);
 
 	switch (depth) {
 		case ND_DEPTH_0:	depth_str = "0";
@@ -573,7 +683,12 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 
 	sprintf(depth_header, "Depth: %s\r\n", depth_str);
 	if ( snprintf(propfind_request, sizeof(propfind_request),
-				request_templ, ns, prop) >= (int) sizeof(propfind_request) )
+				  request_templ,
+				  *namespace ? namespace : "",
+				  *namespace ? "ns:"
+							 : live_prop ? "D:" : "",
+				  prop)
+		 >= (int) sizeof(propfind_request) )
 		return -1;
 
 	return nd_dav_request("PROPFIND", url, auth,
@@ -672,29 +787,17 @@ void nd_parse_prop(xmlNodePtr cur, ndNodeInfoPtr node) {
 	 * prop ANY
 	 */
 	while (cur != NULL) {
+		struct live_dav_prop *ldp;
+		int found = 0;
 
-		if ( nd_dav_name_equal(cur, "lockdiscovery") )
-			node->lock = nd_parse_lockdiscovery(cur);
-
-		else if ( nd_dav_name_equal(cur, "supportedlock") ) {
-			// not supported yet.
-		}
-		else if ( nd_dav_name_equal(cur, "getetag") ) {
-			// not supported yet.
-		}
-		else if ( nd_dav_name_equal(cur, "getlastmodified") )
-			node->date = (char *) xmlNodeGetContent(cur);
-		else if ( nd_dav_name_equal(cur, "creationdate") )
-			node->cdate = (char *) xmlNodeGetContent(cur);
-		else if ( nd_dav_name_equal(cur, "getcontenttype") )
-			node->content = (char *) xmlNodeGetContent(cur);
-		else if ( nd_dav_name_equal(cur, "getcontentlength") )
-			node->size = (char *) xmlNodeGetContent(cur);
-		else if ( nd_dav_name_equal(cur, "resourcetype") ) {
-			if (cur->children != NULL)
-				node->restype = xmlMemStrdup((char *) cur->children->name);
-		}
-		else if ( strcmp((char *) cur->name, "text") ) { /* XXX is this true? */
+		for (ldp = live_dav_props; ldp->prop; ldp++)
+			if ( nd_dav_name_equal(cur, ldp->prop) && ldp->action ) {
+				found = 1;
+				ldp->action(cur, node);
+				break;
+			}
+		if ( !found && strcmp((char *) cur->name, "text") ) {
+			/* XXX is this true? */
 			ndPropPtr prop;
 			prop = node->props;
 			node->props = ndPropNew();
@@ -945,28 +1048,38 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 				char * lock_token, ndNodeInfoPtr * ni_return)
 {
 	int code;
+	int live_prop = 0;
+	char namespace[ND_REQUEST_MAX] = "";
 	char proppatch_request[ND_REQUEST_MAX];
 	char hstr[ND_HEADER_LINE_MAX];
 	ndNodeInfoPtr ret;
 	xmlBufferPtr buf = NULL;
 	xmlDocPtr doc;
-	const char update_string[] = 
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+
+	const char *namespace_templ = " xmlns:ns=\"%s\"";
+	const char update_string[] =
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
 		"\t<D:set>\n"
-		"\t\t<D:prop><ns:%s xmlns:ns=\"%s\">%s</ns:%s></D:prop>\n"
+		"\t\t<D:prop><%s%s%s>%s</%s%s></D:prop>\n"
 		"\t</D:set>\n"
 		"</D:propertyupdate>\n";
 	const char update_remove[] =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
 		"\t<D:remove>\n"
-		"\t\t<D:prop><ns:%s xmlns:ns=\"%s\"/></D:prop>\n"
+		"\t\t<D:prop><%s%s%s/></D:prop>\n"
 		"\t</D:remove>\n"
 		"</D:propertyupdate>\n";
 
-	if (ns == NULL)
-		ns = "DAV:";
+	if (ns && *ns) {
+		if ( snprintf(namespace, sizeof(namespace),
+					  namespace_templ, ns)
+			 >= (int) sizeof(namespace))
+			return -1;
+	} else
+		live_prop = is_live_dav_prop(prop);
+
 	if (lock_token) {
 		if ( snprintf(hstr, sizeof(hstr),
 					"If: <%s> (<%s>)\r\n", url, lock_token)
@@ -978,15 +1091,27 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 
 	if (value) {
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
-					update_string, prop, ns, value, prop)
-				>= (int) sizeof(proppatch_request) )
+					  update_string,
+					  *namespace ? "ns:"
+								 : live_prop ? "D:" : "",
+					  prop,
+					  *namespace ? namespace : "",
+					  value,
+					  *namespace ? "ns:"
+								 : live_prop ? "D:" : "",
+					  prop)
+			 >= (int) sizeof(proppatch_request) )
 			return -1;
 	} else {
 		/* No value at all. Submit a REMOVE. */
 
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
-					update_remove, prop, ns)
-				>= (int) sizeof(proppatch_request) )
+					  update_remove,
+					  *namespace ? "ns:"
+								 : live_prop ? "D:" : "",
+					  prop,
+					  namespace ? namespace : "")
+			 >= (int) sizeof(proppatch_request) )
 			return -1;
 	}
 
@@ -1201,7 +1326,7 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 	char scope_str[16];
 	char hstr[ND_HEADER_LINE_MAX];
 	const char locktype_string[] =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n\n"
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:lockinfo xmlns:D='DAV:'>\n"
 		"\t<D:lockscope><D:%s/></D:lockscope>\n"
 		"\t<D:locktype><D:write/></D:locktype>\n"
