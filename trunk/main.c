@@ -109,66 +109,67 @@ void error_exit(int format, const char *fmt, ...) {
 
 #define ND_USAGE "%s version %s\n"\
 	"usage: %s [options] url\n\n"\
-	"If no option is given, the http-action GET is implied.\n\n\
+	"If no option is given, the http-action GET is implied.\n\n"\
+	"Actions:\n\
 	-c|--copy-to <dest_url>\n\
-		COPY url to the 'dest_url'.\n\
-		(Not yet implemented.)\n\
-	-v|--view\n\
-		View property information of url by PROPFIND.\n\
-		With option '-g', only the specified property is displayed.\n\
-	-n|--prop-name\n\
-		Retreive all available property names of the specified url.\n\
-		This displays properties without value, but with name space.\n\
-	-q|--quiet\n\
-		Print quietly: only properties, no headers.\n\
-	-p|--put-file <file>\n\
-		Write file content to the url by PUT.\n\
-		Uses a lock token if also '-t' is specified. \n\
-	-g|--get-prop <name>\n\
-		Specify the property name for option '-v'.\n\
+		Copy 'url' to 'dest_url'.\n\
+	-d|--delete\n\
+		Delete 'url'. Use a locking token if also '-t' is specified. \n\
 	-e|--edit-prop <name=value>\n\
 		Edit the property 'name'. Its value is changed to 'value'.\n\
 		When multiple '-e' options are specified, only the first\n\
 		one takes effect.\n\
-		A namespace marker '-N' is required if the namespace of the\n\
-		property is something other than 'DAV:'.\n\
-	-N|--namespace <namespace-url>\n\
-		Specify the property namespace URL for '-e' or '-g' option.\n\
-	-P|--post <file>\n\
-		POST file content to the url. Option '-T' is required.\n\
-	-T|--content-type <content_type>\n\
-		Use content_type as a Content-Type of the POST request.\n\
-		Default is `application/x-www-form-urlencoded'.\n\
-	-d|--delete\n\
-		DELETE url. Use a lock token if also '-t' is specified. \n\
-	-l|--lock\n\
-		LOCK url.\n\
 	-k|--mkcol\n\
-		MKCOL url.\n\
+		Create the collection 'url', i.e., MKCOL 'url'.\n\
+	-l|--lock\n\
+		Put a lock on 'url', i.e., LOCK 'url'.\n\
 	-m|--move <dest_url>\n\
-		MOVE url to the 'dest_url'. (Not yet implemented.)\n\
-	-o|--owner <owner>\n\
-		Specify lock owner. Default is USER environment variable.\n\
-	-r|--recursive\n\
-		Execute operation by setting depth to infinity.\n\
-		(Not yet implemented.)\n\
-	-a|--auth <realm>\n\
-		Specify authentication realm for the request.\n\
-	-A|--proxy-auth <realm>\n\
-		Specify proxy authentication realm for the request.\n\
-	-s|--scope <scope>\n\
-		Specify lock scope (`exclusive' or `shared'). The default\n\
-		is `exclusive'.\n\
-	-i|--timeout <timeout>\n\
-		Specify lock timeout interval. Default is `Infinite'.\n\
+		Move 'url' to 'dest_url'.\n\
+	-n|--prop-name\n\
+		Retrieve all available property names of the specified url.\n\
+		This displays properties without value, but with name spaces.\n\
+	-p|--put-file <file>\n\
+		Write the contents of 'file' to 'url' by a PUT request.\n\
+		Use a locking token if also '-t' is specified. \n\
+	-P|--post <file>\n\
+		Submit the contents of 'file' to 'url' as a POST request.\n\
+		The content option '-T' is required.\n\
 	-u|--unlock\n\
-		UNLOCK url. The option '-t' is required.\n\
+		Issue UNLOCK for 'url'. A token option '-t' is required.\n\
+	-v|--view\n\
+		View property information of 'url' using PROPFIND.\n\
+		With '-g', only the specified property is requested.\n\n"\
+	"Selection modifiers:\n\n\
+	-a|--auth <realm>\n\
+		Specify authentication realm for a request.\n\
+	-A|--proxy-auth <realm>\n\
+		Name the proxy authentication realm for the request.\n\
+	-g|--get-prop <name>\n\
+		Request the property 'name', for use with option '-v'.\n\
+	-i|--timeout <timeout>\n\
+		Specify locking timeout interval. Default is `Infinite'.\n\
+	-N|--namespace <namespace-url>\n\
+		State the property's namespace, for '-e' or '-g'.\n\
+	-o|--owner <owner>\n\
+		Claim the lock's owner. Default is environment variable USER.\n\
+	-r|--recursive\n\
+		When acting on a collection with either of the operations\n\
+		'-v', '-l', or '-u', set the depth to infinity, not one.\n\
+	-s|--scope <scope>\n\
+		Specify locking scope (`exclusive' or `shared').\n\
+		The default is `exclusive'.\n\
 	-t|--token <token>\n\
-		Use lock token `token'.\n\
-	-S|--s-expr\n\
-		Print output by s-expression.\n\
+		Use locking token `token'.\n\
+	-T|--content-type <content_type>\n\
+		Set 'content_type' as Content-Type of the POST request.\n\
+		Default is `application/x-www-form-urlencoded'.\n\n"\
+	"Report format modifiers:\n\n\
 	-D|--debug\n\
 		Debug mode.\n\
+	-q|--quiet\n\
+		Print quietly: only properties, no headers.\n\
+	-S|--s-expr\n\
+		Print output as s-expressions.\n\
 	-V|--version\n\
 		Print version.\n"
 
