@@ -1,5 +1,20 @@
 2012-12-22	Mats Erik Andersson <meand@users.berlios.de>
 
+	Dynamic allocation of property requests.
+
+	* ndav.c (PROPFIND_HEAD, PROPFIND_TAIL, PROPUPDATE_HEAD)
+	(PROPUPDATE_TAIL): New macros.
+	(nd_propfind_query): New variables code, length, prop_part.
+	New type for propfind_request. Reduced value for request_templ.
+	Dynamically allocate propfind_request and prop_part. Assign
+	status of nd_dav_request() in `code'.
+	(ndPropPatch): New variables length, prop_part. New type for
+	proppatch_request. Reduced values for update_string and
+	update_remove.  Dynamically allocate proppatch_request and
+	prop_part.
+
+2012-12-22	Mats Erik Andersson <meand@users.berlios.de>
+
 	Make option '-g' force '-v'.
 
 	* main.c (ND_USAGE): Update.

@@ -42,6 +42,18 @@
 
 #define NAMESPACE_TEMPL " xmlns:ns=\"%s\""
 
+#define PROPFIND_HEAD \
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
+		"<D:propfind xmlns:D=\"DAV:\">\n"
+
+#define PROPFIND_TAIL "</D:propfind>\n"
+
+#define PROPUPDATE_HEAD \
+		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
+		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
+
+#define PROPUPDATE_TAIL "</D:propertyupdate>\n"
+
 struct live_dav_prop {
 	char *prop;
 	int protected;
@@ -633,16 +645,13 @@ int
 nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 					 char * ns, int depth, xmlBufferPtr * buf_return)
 {
+	int code;
 	int live_prop = 0;
-	size_t len;
-	char propfind_request[ND_REQUEST_MAX];
+	size_t length, len;
+	char *propfind_request, *prop_part;
 	char *namespace = NULL;
 
-	const char *request_templ =	
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
-		"<D:propfind xmlns:D=\"DAV:\">\n"
-		"\t<D:prop%s><%s%s/></D:prop>\n"
-		"</D:propfind>\n";
+	const char *request_templ =	"\t<D:prop%s><%s%s/></D:prop>\n";
 
 	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
 		depth = ND_DEPTH_0;
@@ -658,20 +667,60 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 	} else
 		live_prop = is_live_dav_prop(prop);
 
-	if ( snprintf(propfind_request, sizeof(propfind_request),
-				  request_templ,
+	length = sizeof(PROPFIND_HEAD PROPFIND_TAIL);
+
+	propfind_request = (char *) malloc(length);
+	if (!propfind_request) {
+		free(namespace);
+		return -1;
+	}
+
+	strncpy(propfind_request, PROPFIND_HEAD, length);
+
+	len = strlen(request_templ) +
+			(namespace && *namespace ? strlen(namespace) : 0) +
+			strlen("ns:") + strlen(prop) + 1;
+
+	prop_part = (char *) malloc(len);
+	if (!prop_part) {
+		free(namespace);
+		free(propfind_request);
+		return -1;
+	}
+
+	if ( snprintf(prop_part, len, request_templ,
 				  namespace && *namespace ? namespace : "",
 				  namespace && *namespace ? "ns:"
 										  : live_prop ? "D:" : "",
-				  prop)
-		 >= (int) sizeof(propfind_request) )
+				  prop) >= (int) len) {
+		free(namespace);
+		free(propfind_request);
+		free(prop_part);
 		return -1;
+	}
 
 	free(namespace);	/* No more use.  */
 
-	return nd_dav_request("PROPFIND", url, auth,
+	length += len;		/* Property selector usage.  */
+
+	propfind_request = (char *) realloc(propfind_request, length);
+	if (!propfind_request) {
+		free(prop_part);
+		return -1;
+	}
+
+	strncat(propfind_request, prop_part, len);
+	strncat(propfind_request, PROPFIND_TAIL,
+			length - strlen(propfind_request));
+
+	free(prop_part);	/* No more use.  */
+
+	code = nd_dav_request("PROPFIND", url, auth,
 							 depth_header[depth], propfind_request,
 							 strlen(propfind_request), buf_return);
+	free(propfind_request);
+
+	return code;
 }; /* nd_propfind_query(...) */
 
 int nd_dav_name_equal(xmlNodePtr node, char * name) {
@@ -1027,28 +1076,22 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 {
 	int code;
 	int live_prop = 0;
-	size_t len;
+	size_t length, len;
 	char *namespace = NULL;
-	char proppatch_request[ND_REQUEST_MAX];
+	char *proppatch_request, *prop_part;
 	char hstr[ND_HEADER_LINE_MAX];
 	ndNodeInfoPtr ret;
 	xmlBufferPtr buf = NULL;
 	xmlDocPtr doc;
 
 	const char update_string[] =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
-		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
 		"\t<D:set>\n"
 		"\t\t<D:prop><%s%s%s>%s</%s%s></D:prop>\n"
-		"\t</D:set>\n"
-		"</D:propertyupdate>\n";
+		"\t</D:set>\n";
 	const char update_remove[] =
-		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
-		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
 		"\t<D:remove>\n"
 		"\t\t<D:prop><%s%s%s/></D:prop>\n"
-		"\t</D:remove>\n"
-		"</D:propertyupdate>\n";
+		"\t</D:remove>\n";
 
 	if (ns && *ns) {
 		len = sizeof(NAMESPACE_TEMPL) + strlen(ns);
@@ -1072,9 +1115,29 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	else
 		hstr[0] = '\0';
 
+	length = sizeof(PROPUPDATE_HEAD PROPUPDATE_HEAD);
+
+	proppatch_request = (char *) malloc(length);
+	if (!proppatch_request) {
+		free(namespace);
+		return -1;
+	}
+
+	strncpy(proppatch_request, PROPUPDATE_HEAD, length);
+
 	if (value) {
-		if ( snprintf(proppatch_request, sizeof(proppatch_request),
-					  update_string,
+		len = strlen(update_string) + 2 * strlen(prop) + strlen(value)
+				+ (namespace && *namespace ? strlen(namespace) : 0)
+				+ 2 * strlen("ns:");
+
+		prop_part = (char *) malloc(len);
+		if (!prop_part) {
+			free(namespace);
+			free(proppatch_request);
+			return -1;
+		}
+
+		if ( snprintf(prop_part, len, update_string,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
 					  prop,
@@ -1082,29 +1145,60 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 					  value,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  prop)
-			 >= (int) sizeof(proppatch_request) ) {
+					  prop) >= (int) len ) {
 			free(namespace);
+			free(proppatch_request);
+			free(prop_part);
 			return -1;
 		}
 	} else {
 		/* No value at all. Submit a REMOVE. */
 
-		if ( snprintf(proppatch_request, sizeof(proppatch_request),
-					  update_remove,
+		len = strlen(update_remove) + strlen(prop)
+				+ (namespace && *namespace ? strlen(namespace) : 0)
+				+ strlen("ns:");
+
+		prop_part = (char *) malloc(len);
+		if (!prop_part) {
+			free(namespace);
+			free(proppatch_request);
+			return -1;
+		}
+
+		if ( snprintf(prop_part, len, update_remove,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
 					  prop,
 					  namespace && *namespace ? namespace : "")
-			 >= (int) sizeof(proppatch_request) ) {
+			 >= (int) len ) {
 			free(namespace);
+			free(proppatch_request);
+			free(prop_part);
 			return -1;
 		}
 	}
+
 	free(namespace);	/* No more use.  */
+
+	length += len;		/* Property specific use.  */
+
+	proppatch_request = (char *) realloc(proppatch_request, length);
+	if (!proppatch_request) {
+		free(prop_part);
+		return -1;
+	}
+
+	strncat(proppatch_request, prop_part, len);
+	strncat(proppatch_request, PROPUPDATE_TAIL,
+			length - strlen(proppatch_request));
+
+	free(prop_part);
 
 	code = nd_dav_request("PROPPATCH", url, auth, hstr, proppatch_request,
 						strlen(proppatch_request), &buf);
+
+	free(proppatch_request);
+
 	if (code == -1)
 		return -1;
 
@@ -1383,7 +1477,7 @@ int ndLock(char * url, ndAuthCtxtPtr auth, int depth, char * owner,
 	return code;
 }; /* ndLock(...) */
 
-int ndUnlock(char * url, ndAuthCtxtPtr auth, int	depth, char * token)
+int ndUnlock(char * url, ndAuthCtxtPtr auth, int depth, char * token)
 {
 	int code;
 	void * ctxt;
