@@ -1,3 +1,24 @@
+2012-12-22	Mats Erik Andersson <meand@users.berlios.de>
+
+	Make option '-g' force '-v'.
+
+	* main.c (ND_USAGE): Update.
+	(main) <option 'g'>: Set mode to 'v'.
+
+	Code cleaning.
+
+	* ndav.c (depth_header): New, constant string array.
+	(nd_propfind_propname_query): Delete depth_str, depth_header.
+	Use depth_header[].
+	(nd_propfind_all_query, nd_propfind_query): Likewise.
+	(nd_lock_request, ndUnlock): Likewise.
+
+	* ndav.c: Include <stdlib.h>.
+	(NAMESPACE_TEMPL): New macro.
+	(nd_propfind_query): New variable len. New type for namespace.
+	Delete namespace_templ. Allocate namespace dynamically.
+	(ndPropPatch): Likewise.
+
 2012-12-14	Mats Erik Andersson <meand@users.berlios.de>
 
 	Better standard compliance with live properties and

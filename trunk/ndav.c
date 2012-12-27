@@ -24,6 +24,7 @@
 #endif /* !__unused */
 
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef HAVE_STRING_H
 # include <string.h>
 #endif /* HAVE_STRING_H */
@@ -39,6 +40,8 @@
 
 #include "ndav.h"
 
+#define NAMESPACE_TEMPL " xmlns:ns=\"%s\""
+
 struct live_dav_prop {
 	char *prop;
 	int protected;
@@ -47,6 +50,12 @@ struct live_dav_prop {
 
 const char *export_method = "";
 const char *export_uri = "";
+
+const char *depth_header[] = {
+	"Depth: 0\r\n",
+	"Depth: 1\r\n",
+	"Depth: Infinity\r\n"
+};
 
 void ndav_get_creationdate(xmlNodePtr, ndNodeInfoPtr);
 void ndav_get_resourcetype(xmlNodePtr, ndNodeInfoPtr);
@@ -587,24 +596,15 @@ void ndav_get_lockdiscovery(xmlNodePtr cur, ndNodeInfoPtr node) {
 int nd_propfind_propname_query(char * url, ndAuthCtxtPtr auth,
 						 int depth, xmlBufferPtr * buf_return)
 {
-	char * depth_str = NULL;
-	char depth_header[ND_HEADER_LINE_MAX];
 	const char * verboseQuery =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\"><D:propname/></D:propfind>\n";
 
-	switch (depth) {
-		case ND_DEPTH_0:	depth_str = "0";
-							break;
-		case ND_DEPTH_1:	depth_str = "1";
-							break;
-		case ND_DEPTH_INFINITE:	depth_str = "Infinity";
-								break;
-	}
+	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
+		depth = ND_DEPTH_0;
 
-	sprintf(depth_header, "Depth: %s\r\n", depth_str);
 	return nd_dav_request("PROPFIND", url, auth,
-						 depth_header, verboseQuery,
+						 depth_header[depth], verboseQuery,
 						 strlen(verboseQuery), buf_return);
 }; /* nd_propfind_propname_query(char *, ndAuthCtxtPtr, int, xmlBufferPtr *) */
 
@@ -614,34 +614,16 @@ int nd_propfind_propname_query(char * url, ndAuthCtxtPtr auth,
 int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
 						 int depth, xmlBufferPtr * buf_return)
 {
-	char * depth_str = NULL;
-	char depth_header[ND_HEADER_LINE_MAX];
 	const char * verboseQuery =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\"><D:allprop/></D:propfind>\n";
 
-	switch (depth) {
-		case ND_DEPTH_0:	depth_str = "0";
-							break;
-		case ND_DEPTH_1:	depth_str = "1";
-							break;
-		case ND_DEPTH_INFINITE:	depth_str = "Infinity";
-								break;
-	}
+	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
+		depth = ND_DEPTH_0;
 
-	sprintf(depth_header, "Depth: %s\r\n", depth_str);
 	return nd_dav_request("PROPFIND", url, auth,
-						 depth_header, verboseQuery,
+						 depth_header[depth], verboseQuery,
 						 strlen(verboseQuery), buf_return);
-	/*
-	if (url[strlen(url) - 1] == '/')
-		return nd_dav_request("PROPFIND", url, fn, "Depth: 1\r\n", NULL, 0,
-				 buf_return);
-	else
-		return nd_dav_request("PROPFIND", url, fn, "Depth: 0\r\n", verboseQuery,
-				 strlen(verboseQuery),
-				 buf_return);
-	*/
 }; /* nd_propfind_all_query(char *, ndAuthCtxtPtr, int, xmlBufferPtr *) */
 
 /*
@@ -652,47 +634,43 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 					 char * ns, int depth, xmlBufferPtr * buf_return)
 {
 	int live_prop = 0;
-	char * depth_str = NULL;
-	char depth_header[ND_HEADER_LINE_MAX];
+	size_t len;
 	char propfind_request[ND_REQUEST_MAX];
-	char namespace[ND_REQUEST_MAX] = "";
+	char *namespace = NULL;
 
-	const char *namespace_templ = " xmlns:ns=\"%s\"";
 	const char *request_templ =	
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propfind xmlns:D=\"DAV:\">\n"
 		"\t<D:prop%s><%s%s/></D:prop>\n"
 		"</D:propfind>\n";
 
+	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
+		depth = ND_DEPTH_0;
+
 	if (ns && *ns) {
-		if ( snprintf(namespace, sizeof(namespace),
-					  namespace_templ, ns)
-			 >= (int) sizeof(namespace))
+		len = sizeof(NAMESPACE_TEMPL) + strlen(ns);
+
+		namespace = malloc(len);
+		if (!namespace)
 			return -1;
+
+		snprintf(namespace, len, NAMESPACE_TEMPL, ns);
 	} else
 		live_prop = is_live_dav_prop(prop);
 
-	switch (depth) {
-		case ND_DEPTH_0:	depth_str = "0";
-							break;
-		case ND_DEPTH_1:	depth_str = "1";
-							break;
-		case ND_DEPTH_INFINITE:	depth_str = "Infinity";
-								break;
-	}
-
-	sprintf(depth_header, "Depth: %s\r\n", depth_str);
 	if ( snprintf(propfind_request, sizeof(propfind_request),
 				  request_templ,
-				  *namespace ? namespace : "",
-				  *namespace ? "ns:"
-							 : live_prop ? "D:" : "",
+				  namespace && *namespace ? namespace : "",
+				  namespace && *namespace ? "ns:"
+										  : live_prop ? "D:" : "",
 				  prop)
 		 >= (int) sizeof(propfind_request) )
 		return -1;
 
+	free(namespace);	/* No more use.  */
+
 	return nd_dav_request("PROPFIND", url, auth,
-							 depth_header, propfind_request,
+							 depth_header[depth], propfind_request,
 							 strlen(propfind_request), buf_return);
 }; /* nd_propfind_query(...) */
 
@@ -1049,14 +1027,14 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 {
 	int code;
 	int live_prop = 0;
-	char namespace[ND_REQUEST_MAX] = "";
+	size_t len;
+	char *namespace = NULL;
 	char proppatch_request[ND_REQUEST_MAX];
 	char hstr[ND_HEADER_LINE_MAX];
 	ndNodeInfoPtr ret;
 	xmlBufferPtr buf = NULL;
 	xmlDocPtr doc;
 
-	const char *namespace_templ = " xmlns:ns=\"%s\"";
 	const char update_string[] =
 		"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
 		"<D:propertyupdate xmlns:D=\"DAV:\">\n"
@@ -1073,18 +1051,23 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		"</D:propertyupdate>\n";
 
 	if (ns && *ns) {
-		if ( snprintf(namespace, sizeof(namespace),
-					  namespace_templ, ns)
-			 >= (int) sizeof(namespace))
+		len = sizeof(NAMESPACE_TEMPL) + strlen(ns);
+
+		namespace = malloc(len);
+		if (!namespace)
 			return -1;
+
+		snprintf(namespace, len, NAMESPACE_TEMPL, ns);
 	} else
 		live_prop = is_live_dav_prop(prop);
 
 	if (lock_token) {
 		if ( snprintf(hstr, sizeof(hstr),
 					"If: <%s> (<%s>)\r\n", url, lock_token)
-				>= (int) sizeof(hstr) )
+				>= (int) sizeof(hstr) ) {
+			free(namespace);
 			return -1;
+		}
 	}
 	else
 		hstr[0] = '\0';
@@ -1092,28 +1075,33 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	if (value) {
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
 					  update_string,
-					  *namespace ? "ns:"
-								 : live_prop ? "D:" : "",
+					  namespace && *namespace ? "ns:"
+											  : live_prop ? "D:" : "",
 					  prop,
-					  *namespace ? namespace : "",
+					  namespace && *namespace ? namespace : "",
 					  value,
-					  *namespace ? "ns:"
-								 : live_prop ? "D:" : "",
+					  namespace && *namespace ? "ns:"
+											  : live_prop ? "D:" : "",
 					  prop)
-			 >= (int) sizeof(proppatch_request) )
+			 >= (int) sizeof(proppatch_request) ) {
+			free(namespace);
 			return -1;
+		}
 	} else {
 		/* No value at all. Submit a REMOVE. */
 
 		if ( snprintf(proppatch_request, sizeof(proppatch_request),
 					  update_remove,
-					  *namespace ? "ns:"
-								 : live_prop ? "D:" : "",
+					  namespace && *namespace ? "ns:"
+											  : live_prop ? "D:" : "",
 					  prop,
-					  namespace ? namespace : "")
-			 >= (int) sizeof(proppatch_request) )
+					  namespace && *namespace ? namespace : "")
+			 >= (int) sizeof(proppatch_request) ) {
+			free(namespace);
 			return -1;
+		}
 	}
+	free(namespace);	/* No more use.  */
 
 	code = nd_dav_request("PROPPATCH", url, auth, hstr, proppatch_request,
 						strlen(proppatch_request), &buf);
@@ -1321,7 +1309,6 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 					char * owner, int scope, char * timeout,
 					xmlBufferPtr * buf_return)
 {
-	char * depth_str = NULL;
 	char lock_request[ND_REQUEST_MAX];
 	char scope_str[16];
 	char hstr[ND_HEADER_LINE_MAX];
@@ -1354,22 +1341,17 @@ int nd_lock_request(char * url, ndAuthCtxtPtr auth, int	depth,
 			>= (int) sizeof(lock_request) )
 		return -1;
 
-	switch (depth) {
-		case ND_DEPTH_0:
-		case ND_DEPTH_1: /* DEPTH 1 is not allowed. */
-			depth_str = "0";
-			break;
-		case ND_DEPTH_INFINITE:
-			depth_str = "Infinity";
-			break;
-	}
+	/* Depth 1 is forbidden.  */
+	if (depth != ND_DEPTH_0 && depth != ND_DEPTH_INFINITE)
+		depth = ND_DEPTH_0;
+
 	if (timeout) {
 		if ( snprintf(hstr, sizeof(hstr),
-					"Timeout: %s\r\nDepth: %s\r\n", timeout, depth_str)
+					"Timeout: %s\r\n%s", timeout, depth_header[depth])
 				>= (int) sizeof(hstr) )
 			return -1;
 	} else
-		sprintf(hstr, "Depth: %s\r\n", depth_str);
+		sprintf(hstr, "%s", depth_header[depth]);
 
 	return nd_dav_request("LOCK", url, auth, hstr, lock_request,
 							strlen(lock_request), buf_return);
@@ -1405,25 +1387,15 @@ int ndUnlock(char * url, ndAuthCtxtPtr auth, int	depth, char * token)
 {
 	int code;
 	void * ctxt;
-	char * depth_str = NULL;
 	char hstr[ND_HEADER_LINE_MAX];
 
-	switch (depth) {
-		case ND_DEPTH_0:
-			depth_str = "0";
-			break;
-		case ND_DEPTH_1:
-			depth_str = "1";
-			break;
-		case ND_DEPTH_INFINITE:
-			depth_str = "Infinity";
-			break;
-	}
+	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
+		depth = ND_DEPTH_0;
 
 	if (url == NULL || token == NULL)
 		return -1;
 	if ( snprintf(hstr, sizeof(hstr),
-				"Lock-token: <%s>\r\nDepth: %s\r\n", token, depth_str)
+				"Lock-token: <%s>\r\n%s", token, depth_header[depth])
 			>= (int) sizeof(hstr) )
 		return -1;
 

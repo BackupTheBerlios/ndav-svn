@@ -119,6 +119,8 @@ void error_exit(int format, const char *fmt, ...) {
 		Edit the property 'name'. Its value is changed to 'value'.\n\
 		When multiple '-e' options are specified, only the first\n\
 		one takes effect.\n\
+	-g|--get-prop <name>\n\
+		Request the property named 'name'.\n\
 	-k|--mkcol\n\
 		Create the collection 'url', i.e., MKCOL 'url'.\n\
 	-l|--lock\n\
@@ -144,8 +146,6 @@ void error_exit(int format, const char *fmt, ...) {
 		Specify authentication realm for a request.\n\
 	-A|--proxy-auth <realm>\n\
 		Name the proxy authentication realm for the request.\n\
-	-g|--get-prop <name>\n\
-		Request the property 'name', for use with option '-v'.\n\
 	-i|--timeout <timeout>\n\
 		Specify locking timeout interval. Default is `Infinite'.\n\
 	-N|--namespace <namespace-url>\n\
@@ -270,6 +270,7 @@ int main(int argc, char * argv[]) {
 						edit = optarg;
 						break;
 			case 'g':	prop = optarg;
+						mode = 'v';
 						break;
 			case 'l':	mode = 'l';
 						timeout = "Infinite";
