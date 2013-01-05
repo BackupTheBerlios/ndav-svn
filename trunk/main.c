@@ -19,10 +19,6 @@
 # include <sys/cdefs.h>
 #endif /* HAVE_SYS_CDEFS_H */
 
-#ifndef __unused
-# define __unused
-#endif /* !__unused */
-
 #include "ndav.h"
 
 #include <stdarg.h>
@@ -229,7 +225,7 @@ int authenticate( ndAuthParamPtr param, int is_proxy) {
 
 #undef WAIT_FOR_END
 
-void null_error_handler(void *ctx __unused, const char *msg __unused, ...) {
+void null_error_handler(void *ctx, const char *msg, ...) {
 	/* Empty */
 }; /* null_error_handler(...) */
 

@@ -17,7 +17,7 @@ AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([1.9])
 
 AC_CONFIG_SRCDIR(xml/ndav.css)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC

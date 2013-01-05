@@ -19,10 +19,6 @@
 # include <sys/cdefs.h>
 #endif /* HAVE_SYS_CDEFS_H */
 
-#ifndef __unused
-# define __unused
-#endif /* !__unused */
-
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_STRING_H
@@ -526,7 +522,7 @@ int nd_dav_request( char * method,
 					ndAuthCtxtPtr auth,
 					const char * header,
 					const char * content,
-					int length __unused,
+					int length,
 					xmlBufferPtr * buf_return)
 {
 	int len, returnCode;
