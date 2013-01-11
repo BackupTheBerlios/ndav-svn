@@ -1,3 +1,23 @@
+2013-01-11	Mats Erik Andersson <meand@users.berlios.de>
+
+	Handle multiple find or patch requests.
+
+	* main.c (main) <command selector, cases 'e', 'g'>:
+	Use strdup() on all arguments. Set `prp->type'.
+
+	* ndav.c (PROPSET_HEAD, PROPSET_TAIL, PROPREMOVE_HEAD)
+	(PROPREMOVE_TAIL): New macros.
+	(nd_propfind_query): Modify `request_templ' for better
+	use of variable namespace setting. Loop over all find
+	requests passed in parameter `req', and handle only those
+	of type NDPROP_FIND.
+	(ndPropPatch): Loop over all patch requests in `req'.
+	Separate NDPROP_PATCH and NDPROP_REMOVE in two loops.
+	Simplify `update_string' and `update_remove'.
+	* ndav.h (NDPROP_NONE, NDPROP_FIND, NDPROP_PATCH, NDPROP_REMOVE):
+	New enum values.
+	(struct _nd_prop): New field `type'.
+
 2013-01-07	Mats Erik Andersson <meand@users.berlios.de>
 
 	Pass request data in a structure.

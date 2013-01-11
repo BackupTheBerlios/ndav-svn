@@ -50,6 +50,14 @@
 
 #define PROPUPDATE_TAIL "</D:propertyupdate>\n"
 
+#define PROPSET_HEAD "\t<D:set>\n"
+
+#define PROPSET_TAIL "\t</D:set>\n"
+
+#define PROPREMOVE_HEAD "\t<D:remove>\n"
+
+#define PROPREMOVE_TAIL "\t</D:remove>\n"
+
 struct live_dav_prop {
 	char *prop;
 	int protected;
@@ -646,66 +654,75 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, ndPropPtr req,
 	size_t length, len;
 	char *propfind_request, *prop_part;
 	char *namespace = NULL;
+	ndPropPtr prp;
 
-	const char *request_templ =	"\t<D:prop%s><%s%s/></D:prop>\n";
+	const char *request_templ =	"\t<D:prop%s><%s%s%s/></D:prop>\n";
 
 	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
 		depth = ND_DEPTH_0;
 
-	if (req->ns && *req->ns) {
-		len = sizeof(NAMESPACE_TEMPL) + strlen(req->ns);
-
-		namespace = malloc(len);
-		if (!namespace)
-			return -1;
-
-		snprintf(namespace, len, NAMESPACE_TEMPL, req->ns);
-	} else
-		live_prop = is_live_dav_prop(req->name);
-
 	length = sizeof(PROPFIND_HEAD PROPFIND_TAIL);
 
 	propfind_request = (char *) malloc(length);
-	if (!propfind_request) {
-		free(namespace);
+	if (!propfind_request)
 		return -1;
-	}
 
 	strncpy(propfind_request, PROPFIND_HEAD, length);
 
-	len = strlen(request_templ) +
-			(namespace && *namespace ? strlen(namespace) : 0) +
-			strlen("ns:") + strlen(req->name) + 1;
+	for (prp = req; prp; prp = prp->next) {
+		if (prp->type != NDPROP_FIND)
+			continue;
 
-	prop_part = (char *) malloc(len);
-	if (!prop_part) {
-		free(namespace);
-		free(propfind_request);
-		return -1;
+		if (prp->ns && *prp->ns) {
+			len = sizeof(NAMESPACE_TEMPL) + strlen(prp->ns);
+
+			namespace = malloc(len);
+			if (!namespace)
+				return -1;
+
+			snprintf(namespace, len, NAMESPACE_TEMPL, prp->ns);
+		} else {
+			live_prop = is_live_dav_prop(prp->name);
+			namespace = NULL;
+		}
+
+		len = strlen(request_templ) +
+				(namespace && *namespace ? strlen(namespace) : 0) +
+				strlen("ns:") + strlen(prp->name) + 1;
+
+		prop_part = (char *) malloc(len);
+		if (!prop_part) {
+			free(namespace);
+			free(propfind_request);
+			return -1;
+		}
+
+		if ( snprintf(prop_part, len, request_templ,
+					  "",
+					  namespace && *namespace ? "ns:"
+											  : live_prop ? "D:" : "",
+					  prp->name,
+					  namespace && *namespace ? namespace : "")
+			  >= (int) len) {
+			free(namespace);
+			free(propfind_request);
+			free(prop_part);
+			return -1;
+		}
+
+		free(namespace);	/* No more use.  */
+
+		length += len;		/* Property selector usage.  */
+
+		propfind_request = (char *) realloc(propfind_request, length);
+		if (!propfind_request) {
+			free(prop_part);
+			return -1;
+		}
+
+		strncat(propfind_request, prop_part, len);
 	}
 
-	if ( snprintf(prop_part, len, request_templ,
-				  namespace && *namespace ? namespace : "",
-				  namespace && *namespace ? "ns:"
-										  : live_prop ? "D:" : "",
-				  req->name) >= (int) len) {
-		free(namespace);
-		free(propfind_request);
-		free(prop_part);
-		return -1;
-	}
-
-	free(namespace);	/* No more use.  */
-
-	length += len;		/* Property selector usage.  */
-
-	propfind_request = (char *) realloc(propfind_request, length);
-	if (!propfind_request) {
-		free(prop_part);
-		return -1;
-	}
-
-	strncat(propfind_request, prop_part, len);
 	strncat(propfind_request, PROPFIND_TAIL,
 			length - strlen(propfind_request));
 
@@ -1069,35 +1086,21 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 				ndPropPtr req, char * lock_token,
 				ndNodeInfoPtr * ni_return)
 {
-	int code;
+	int code, done_set = 0, done_remove = 0;
 	int live_prop = 0;
 	size_t length, len;
 	char *namespace = NULL;
 	char *proppatch_request, *prop_part;
 	char hstr[ND_HEADER_LINE_MAX];
 	ndNodeInfoPtr ret;
+	ndPropPtr prp;
 	xmlBufferPtr buf = NULL;
 	xmlDocPtr doc;
 
 	const char update_string[] =
-		"\t<D:set>\n"
-		"\t\t<D:prop><%s%s%s>%s</%s%s></D:prop>\n"
-		"\t</D:set>\n";
+		"\t\t<D:prop><%s%s%s>%s</%s%s></D:prop>\n";
 	const char update_remove[] =
-		"\t<D:remove>\n"
-		"\t\t<D:prop><%s%s%s/></D:prop>\n"
-		"\t</D:remove>\n";
-
-	if (req->ns && *req->ns) {
-		len = sizeof(NAMESPACE_TEMPL) + strlen(req->ns);
-
-		namespace = malloc(len);
-		if (!namespace)
-			return -1;
-
-		snprintf(namespace, len, NAMESPACE_TEMPL, req->ns);
-	} else
-		live_prop = is_live_dav_prop(req->name);
+		"\t\t<D:prop><%s%s%s/></D:prop>\n";
 
 	if (lock_token) {
 		if ( snprintf(hstr, sizeof(hstr),
@@ -1110,20 +1113,41 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	else
 		hstr[0] = '\0';
 
-	length = sizeof(PROPUPDATE_HEAD PROPUPDATE_HEAD);
+	length = sizeof(PROPUPDATE_HEAD PROPUPDATE_TAIL)
+				+ sizeof(PROPSET_HEAD PROPSET_TAIL)
+				+ sizeof(PROPREMOVE_HEAD PROPREMOVE_TAIL);
 
 	proppatch_request = (char *) malloc(length);
-	if (!proppatch_request) {
-		free(namespace);
+	if (!proppatch_request)
 		return -1;
-	}
 
 	strncpy(proppatch_request, PROPUPDATE_HEAD, length);
 
-	if (req->value) {
+	for (prp = req; prp; prp = prp->next) {
+		if (prp->type != NDPROP_PATCH)
+			continue;
+
+		if (!done_set) {
+			strcat(proppatch_request, PROPSET_HEAD);
+			++done_set;
+		}
+
+		if (prp->ns && *prp->ns) {
+			len = sizeof(NAMESPACE_TEMPL) + strlen(prp->ns);
+
+			namespace = malloc(len);
+			if (!namespace)
+				return -1;
+
+			snprintf(namespace, len, NAMESPACE_TEMPL, prp->ns);
+		} else {
+			live_prop = is_live_dav_prop(prp->name);
+			namespace = NULL;
+		}
+
 		len = strlen(update_string)
-				+ 2 * strlen(req->name)
-				+ strlen(req->value)
+				+ 2 * strlen(prp->name)
+				+ strlen(prp->value)
 				+ (namespace && *namespace ? strlen(namespace) : 0)
 				+ 2 * strlen("ns:");
 
@@ -1137,21 +1161,57 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		if ( snprintf(prop_part, len, update_string,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  req->name,
+					  prp->name,
 					  namespace && *namespace ? namespace : "",
-					  req->value,
+					  prp->value,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  req->name) >= (int) len ) {
+					  prp->name) >= (int) len ) {
 			free(namespace);
 			free(proppatch_request);
 			free(prop_part);
 			return -1;
 		}
-	} else {
-		/* No value at all. Submit a REMOVE. */
 
-		len = strlen(update_remove) + strlen(req->name)
+		free(namespace);
+		length += len;		/* Property specific addition.  */
+
+		proppatch_request = (char *) realloc(proppatch_request, length);
+		if (!proppatch_request) {
+			free(prop_part);
+			return -1;
+		}
+
+		strncat(proppatch_request, prop_part, len);
+		free(prop_part);
+	} /* for (prp->type == NDPROP_PATCH) */
+
+	if (done_set)
+		strcat(proppatch_request, PROPSET_TAIL);
+
+	for (prp = req; prp; prp = prp->next) {
+		if (prp->type != NDPROP_REMOVE)
+			continue;
+
+		if (!done_remove) {
+			strcat(proppatch_request, PROPREMOVE_HEAD);
+			++done_remove;
+		}
+
+		if (prp->ns && *prp->ns) {
+			len = sizeof(NAMESPACE_TEMPL) + strlen(prp->ns);
+
+			namespace = malloc(len);
+			if (!namespace)
+				return -1;
+
+			snprintf(namespace, len, NAMESPACE_TEMPL, prp->ns);
+		} else {
+			live_prop = is_live_dav_prop(prp->name);
+			namespace = NULL;
+		}
+
+		len = strlen(update_remove) + strlen(prp->name)
 				+ (namespace && *namespace ? strlen(namespace) : 0)
 				+ strlen("ns:");
 
@@ -1165,7 +1225,7 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		if ( snprintf(prop_part, len, update_remove,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  req->name,
+					  prp->name,
 					  namespace && *namespace ? namespace : "")
 			 >= (int) len ) {
 			free(namespace);
@@ -1173,23 +1233,25 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 			free(prop_part);
 			return -1;
 		}
-	}
 
-	free(namespace);	/* No more use.  */
+		free(namespace);
+		length += len;		/* Property specific addition.  */
 
-	length += len;		/* Property specific use.  */
+		proppatch_request = (char *) realloc(proppatch_request, length);
+		if (!proppatch_request) {
+			free(prop_part);
+			return -1;
+		}
 
-	proppatch_request = (char *) realloc(proppatch_request, length);
-	if (!proppatch_request) {
+		strncat(proppatch_request, prop_part, len);
 		free(prop_part);
-		return -1;
-	}
+	} /* for (prp->type == NDPROP_REMOVE) */
 
-	strncat(proppatch_request, prop_part, len);
+	if (done_remove)
+		strcat(proppatch_request, PROPREMOVE_TAIL);
+
 	strncat(proppatch_request, PROPUPDATE_TAIL,
 			length - strlen(proppatch_request));
-
-	free(prop_part);
 
 	code = nd_dav_request("PROPPATCH", url, auth, hstr, proppatch_request,
 						strlen(proppatch_request), &buf);

@@ -110,6 +110,16 @@ typedef struct _nd_lock_info
 } ndLockInfo, * ndLockInfoPtr;
 
 /*
+ * Type of request, used for ndProp.
+ */
+enum {
+	NDPROP_NONE = 0,
+	NDPROP_FIND = 1,
+	NDPROP_PATCH = 2,
+	NDPROP_REMOVE = 3,
+};
+
+/*
  * ndProp :
  * Property structure
  */
@@ -119,6 +129,7 @@ typedef struct _nd_prop
 	char * ns;
 	char * name;
 	char * value;
+	int type;		/* Used by request builder. */
 } ndProp, * ndPropPtr;
 
 /*

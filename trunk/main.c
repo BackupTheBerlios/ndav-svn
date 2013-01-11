@@ -276,9 +276,12 @@ int main(int argc, char * argv[]) {
 							if (*value)
 								*value++ = '\0';
 
-							prp->name = optarg;
-							prp->ns = ns;
-							prp->value = *value ? value : NULL;
+							prp->name = strdup(optarg);
+							prp->ns = ns ? strdup(ns) : NULL;
+							prp->value = *value ? strdup(value)
+												: NULL;
+							prp->type = *value ? NDPROP_PATCH
+											   : NDPROP_REMOVE;
 							prp->next = propreq;
 
 							propreq = prp;
@@ -289,9 +292,10 @@ int main(int argc, char * argv[]) {
 						{
 							ndPropPtr prp = ndPropNew();
 
-							prp->name = optarg;
-							prp->ns = ns;
+							prp->name = strdup(optarg);
+							prp->ns = ns ? strdup(ns) : NULL;
 							prp->value = NULL;
+							prp->type = NDPROP_FIND;
 							prp->next = propreq;
 
 							propreq = prp;
