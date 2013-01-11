@@ -45,6 +45,8 @@
 static int format = ND_PRINT_AS_HEADER;
 static int debug = 0;
 
+ndPropPtr propreq = NULL;
+
 static const char optstring[] = "a:c:de:fg:hi:klm:no:p:qrs:t:uvA:DN:P:ST:V";
 
 static const struct option long_options[] = {
@@ -239,10 +241,8 @@ int main(int argc, char * argv[]) {
 	char *owner = NULL;
 	char *dest_url = NULL;
 	char *content_type = "application/x-www-form-urlencoded";
-	char *auth_realm	= NULL;
+	char *auth_realm = NULL;
 	char *pauth_realm = NULL;
-	char *edit = NULL;
-	char *prop = NULL;
 	char *ns = NULL;
 	int scope = ND_LOCK_SCOPE_EXCLUSIVE;
 	int infinite = 0;
@@ -263,10 +263,39 @@ int main(int argc, char * argv[]) {
 						dest_url = optarg;
 						break;
 			case 'e':	mode = 'e';
-						edit = optarg;
+						{
+							char *value = optarg;
+							ndPropPtr prp = ndPropNew();
+
+							/* Locate the equal sign. */
+							while (*value && (*value != '='))
+								value++;
+
+							/* Capture assigned value,
+							 * and crop property name. */
+							if (*value)
+								*value++ = '\0';
+
+							prp->name = optarg;
+							prp->ns = ns;
+							prp->value = *value ? value : NULL;
+							prp->next = propreq;
+
+							propreq = prp;
+
+						}
 						break;
-			case 'g':	prop = optarg;
-						mode = 'v';
+			case 'g':	mode = 'v';
+						{
+							ndPropPtr prp = ndPropNew();
+
+							prp->name = optarg;
+							prp->ns = ns;
+							prp->value = NULL;
+							prp->next = propreq;
+
+							propreq = prp;
+						}
 						break;
 			case 'l':	mode = 'l';
 						timeout = "Infinite";
@@ -356,29 +385,12 @@ int main(int argc, char * argv[]) {
 		case 'e':	{
 						int code;
 						ndNodeInfoPtr ret = NULL;
-						char *name = edit;
-						char *value = NULL;
 
-						/* Locate the equal sign. */
-						for (value = name;
-								(*value != '\0') && (*value != '=');
-								value++)
-							;
+						if (propreq && propreq->next == NULL
+								&& propreq->ns == NULL)
+							propreq->ns = ns;
 
-						/* Now "*value" is either '\0' or '='. */ 
-
-						if ( *value != '\0' )
-							/* Step over the assignment character
-							 * and make sure that "char * name"
-							 * contains only the property name. */
-							*value++ = '\0';
-
-						if ( *value == '\0' )
-							/* An empty value string was submitted. */
-							value = NULL;
-
-						code = ndPropPatch(url, auth, name, value,
-											ns, token, &ret);
+						code = ndPropPatch(url, auth, propreq, token, &ret);
 
 						if ( RETURNED_AN_ERROR(code) )
 							error_exit(format, "PROPPATCH failed, `%s'",
@@ -450,7 +462,11 @@ int main(int argc, char * argv[]) {
 											: ND_DEPTH_1 )
 									: ND_DEPTH_0;
 
-						code = ndPropFind(url, auth, prop, ns, depth,
+						if (propreq && propreq->next == NULL
+								&& propreq->ns == NULL)
+							propreq->ns = ns;
+
+						code = ndPropFind(url, auth, propreq, depth,
 										  (mode == 'n') ? 1 : 0,
 										  &ret);
 						ndFreeAuthCtxt(auth);

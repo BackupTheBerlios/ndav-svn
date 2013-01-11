@@ -638,8 +638,8 @@ int nd_propfind_all_query(char * url, ndAuthCtxtPtr auth,
  * PROPFIND
  */
 int
-nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
-					 char * ns, int depth, xmlBufferPtr * buf_return)
+nd_propfind_query(char * url, ndAuthCtxtPtr auth, ndPropPtr req,
+					 int depth, xmlBufferPtr * buf_return)
 {
 	int code;
 	int live_prop = 0;
@@ -652,16 +652,16 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 	if (depth < ND_DEPTH_0 || depth > ND_DEPTH_INFINITE)
 		depth = ND_DEPTH_0;
 
-	if (ns && *ns) {
-		len = sizeof(NAMESPACE_TEMPL) + strlen(ns);
+	if (req->ns && *req->ns) {
+		len = sizeof(NAMESPACE_TEMPL) + strlen(req->ns);
 
 		namespace = malloc(len);
 		if (!namespace)
 			return -1;
 
-		snprintf(namespace, len, NAMESPACE_TEMPL, ns);
+		snprintf(namespace, len, NAMESPACE_TEMPL, req->ns);
 	} else
-		live_prop = is_live_dav_prop(prop);
+		live_prop = is_live_dav_prop(req->name);
 
 	length = sizeof(PROPFIND_HEAD PROPFIND_TAIL);
 
@@ -675,7 +675,7 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 
 	len = strlen(request_templ) +
 			(namespace && *namespace ? strlen(namespace) : 0) +
-			strlen("ns:") + strlen(prop) + 1;
+			strlen("ns:") + strlen(req->name) + 1;
 
 	prop_part = (char *) malloc(len);
 	if (!prop_part) {
@@ -688,7 +688,7 @@ nd_propfind_query(char * url, ndAuthCtxtPtr auth, char * prop,
 				  namespace && *namespace ? namespace : "",
 				  namespace && *namespace ? "ns:"
 										  : live_prop ? "D:" : "",
-				  prop) >= (int) len) {
+				  req->name) >= (int) len) {
 		free(namespace);
 		free(propfind_request);
 		free(prop_part);
@@ -1026,9 +1026,8 @@ ndNodeInfoPtr nd_parse_multistatus(xmlNodePtr cur) {
 	return ret;
 }; /* nd_parse_multistatus(xmlNodePtr cur) */
 
-int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
-				char * ns, int depth, int detect,
-				ndNodeInfoPtr * ni_return)
+int ndPropFind( char * url, ndAuthCtxtPtr auth, ndPropPtr req,
+				int depth, int detect, ndNodeInfoPtr * ni_return)
 {
 	int code;
 	ndNodeInfoPtr ret;
@@ -1037,10 +1036,10 @@ int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
 
 	if (detect)
 		code = nd_propfind_propname_query(url, auth, depth, &buf);
-	else if (prop == NULL)
+	else if (req == NULL || req->name == NULL)
 		code = nd_propfind_all_query(url, auth, depth, &buf);
 	else
-		code = nd_propfind_query(url, auth, prop, ns, depth, &buf);
+		code = nd_propfind_query(url, auth, req, depth, &buf);
 
 	if (code == -1)
 		return -1;
@@ -1067,8 +1066,8 @@ int ndPropFind( char * url, ndAuthCtxtPtr auth, char * prop,
  * PROPPATCH
  */
 int ndPropPatch(char * url, ndAuthCtxtPtr auth,
-				char * prop, char * value, char * ns,
-				char * lock_token, ndNodeInfoPtr * ni_return)
+				ndPropPtr req, char * lock_token,
+				ndNodeInfoPtr * ni_return)
 {
 	int code;
 	int live_prop = 0;
@@ -1089,16 +1088,16 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		"\t\t<D:prop><%s%s%s/></D:prop>\n"
 		"\t</D:remove>\n";
 
-	if (ns && *ns) {
-		len = sizeof(NAMESPACE_TEMPL) + strlen(ns);
+	if (req->ns && *req->ns) {
+		len = sizeof(NAMESPACE_TEMPL) + strlen(req->ns);
 
 		namespace = malloc(len);
 		if (!namespace)
 			return -1;
 
-		snprintf(namespace, len, NAMESPACE_TEMPL, ns);
+		snprintf(namespace, len, NAMESPACE_TEMPL, req->ns);
 	} else
-		live_prop = is_live_dav_prop(prop);
+		live_prop = is_live_dav_prop(req->name);
 
 	if (lock_token) {
 		if ( snprintf(hstr, sizeof(hstr),
@@ -1121,8 +1120,10 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 
 	strncpy(proppatch_request, PROPUPDATE_HEAD, length);
 
-	if (value) {
-		len = strlen(update_string) + 2 * strlen(prop) + strlen(value)
+	if (req->value) {
+		len = strlen(update_string)
+				+ 2 * strlen(req->name)
+				+ strlen(req->value)
 				+ (namespace && *namespace ? strlen(namespace) : 0)
 				+ 2 * strlen("ns:");
 
@@ -1136,12 +1137,12 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		if ( snprintf(prop_part, len, update_string,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  prop,
+					  req->name,
 					  namespace && *namespace ? namespace : "",
-					  value,
+					  req->value,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  prop) >= (int) len ) {
+					  req->name) >= (int) len ) {
 			free(namespace);
 			free(proppatch_request);
 			free(prop_part);
@@ -1150,7 +1151,7 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 	} else {
 		/* No value at all. Submit a REMOVE. */
 
-		len = strlen(update_remove) + strlen(prop)
+		len = strlen(update_remove) + strlen(req->name)
 				+ (namespace && *namespace ? strlen(namespace) : 0)
 				+ strlen("ns:");
 
@@ -1164,7 +1165,7 @@ int ndPropPatch(char * url, ndAuthCtxtPtr auth,
 		if ( snprintf(prop_part, len, update_remove,
 					  namespace && *namespace ? "ns:"
 											  : live_prop ? "D:" : "",
-					  prop,
+					  req->name,
 					  namespace && *namespace ? namespace : "")
 			 >= (int) len ) {
 			free(namespace);

@@ -1,3 +1,21 @@
+2013-01-07	Mats Erik Andersson <meand@users.berlios.de>
+
+	Pass request data in a structure.
+
+	* main.c (propreq): New variable.
+	(main): Remove variables EDIT and PROP.
+	(main) <option parsing, case 'e'>: Decompose option
+	argument in name and value; populate propreq.
+	<case 'g'>: Populate preopreq.
+	(main) <command selector, case 'e'>: Remove decomposition
+	of option argument.
+	* ndav.h (ndPropFind, ndPropPatch): New signatures.
+	* ndav.c (nd_propfind_query): Pass parameter as ndPropPtr.
+	Use `req->name' `req->ns' for request building.
+	(ndPropFind): Pass parameter as ndPropPtr.
+	(ndPropPatch): Likewise. Build request from `req->name',
+	`req->ns', and `req->value'.
+
 2012-12-22	Mats Erik Andersson <meand@users.berlios.de>
 
 	Dynamic allocation of property requests.

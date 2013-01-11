@@ -216,17 +216,14 @@ extern int ndAuthCreateHeader(char * str,
 /* DAV API */
 extern int ndPropFind(char * url,
 				ndAuthCtxtPtr auth,
-				char * prop,
-				char * ns,
+				ndPropPtr req,
 				int depth,
 				int detect,
 				ndNodeInfoPtr * ni_return);
 
 extern int ndPropPatch(char * url,
 				ndAuthCtxtPtr auth,
-				char * prop,
-				char * value,
-				char * ns,
+				ndPropPtr req,
 				char * lock_token,
 				ndNodeInfoPtr * ni_return);
 
