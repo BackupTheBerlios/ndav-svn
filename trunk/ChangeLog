@@ -1,3 +1,21 @@
+2013-01-12	Mats Erik Andersson <meand@users.berlios.de>
+
+	Use "-F/--find" for PROPFIND requests.
+	Make verbose reporting optional.
+
+	* main.c (optstring): Add 'F'.
+	(long_options): Replace "-v/--view" by "-F/--find".
+	Add "-v/--verbose".
+	(NDAV_SHORT_USAGE): Add 'F'. Insert missing 'f'.
+	(ND_USAGE): Update and insert missing "-f/--force".
+	(main): Attend to changed options 'F' and 'v'.
+	* ndav.c (ndLockInfoPrint): Test NDAV_PRINT_VERBOSELY
+	for non-default mode.
+	(ndPropPrint): Remove initial whitespace in property values.
+	Apache22 is known to insert newlines in "supportedlock".
+	* ndav.h (ND_PRINT_VERBOSELY): New macro.
+	(NDAV_PRINT_VERBOSELY): Update macro.
+
 2013-01-11	Mats Erik Andersson <meand@users.berlios.de>
 
 	Handle multiple find or patch requests.

@@ -47,7 +47,7 @@ static int debug = 0;
 
 ndPropPtr propreq = NULL;
 
-static const char optstring[] = "a:c:de:fg:hi:klm:no:p:qrs:t:uvA:DN:P:ST:V";
+static const char optstring[] = "a:c:de:fg:hi:klm:no:p:qrs:t:uvA:DFN:P:ST:V";
 
 static const struct option long_options[] = {
 	{"copy-to",	required_argument, 0, 'c'},
@@ -59,8 +59,8 @@ static const struct option long_options[] = {
 	{"namespace",	required_argument, 0, 'N'},
 	{"post",	required_argument, 0, 'P'},
 	{"content-type",	required_argument, 0, 'T'},
+	{"find",	no_argument, 0, 'F'},
 	{"force",	no_argument, 0, 'f'},
-	{"view",	no_argument, 0, 'v'},
 	{"prop-name",	no_argument, 0, 'n'},
 	{"lock",	no_argument, 0, 'l'},
 	{"unlock",	no_argument, 0, 'u'},
@@ -76,6 +76,7 @@ static const struct option long_options[] = {
 	{"auth",	required_argument, 0, 'a'},
 	{"proxy-auth",	required_argument, 0, 'A'},
 	{"quiet",	no_argument,	0,	'q'},
+	{"verbose",	no_argument,	0,	'v'},
 	{"version",	no_argument,	0,	'V'},
 	{0, 0, 0, 0}
 };
@@ -102,7 +103,7 @@ void error_exit(int format, const char *fmt, ...) {
 }; /* error_exit(...) */
 
 #define NDAV_SHORT_USAGE "%s version %s\n"		\
-	"usage: %s [-AacdegiklmNnoPpqrSsTtuVv] url\n\n"	\
+	"usage: %s [-AacdeFfgiklmNnoPpqrSsTtuVv] url\n\n"	\
 	"Without options, a GET is implied.\n"
 
 #define ND_USAGE "%s version %s\n"\
@@ -115,8 +116,10 @@ void error_exit(int format, const char *fmt, ...) {
 		Delete 'url'. Use a locking token if also '-t' is specified. \n\
 	-e|--edit-prop <name=value>\n\
 		Edit the property 'name'. Its value is changed to 'value'.\n\
-		When multiple '-e' options are specified, only the first\n\
-		one takes effect.\n\
+		An empty value, or missing equal character, results in the\n\
+		property being removed.\n\
+	-F|--find\n\
+		Query available properties of 'url' using PROPFIND.\n\
 	-g|--get-prop <name>\n\
 		Request the property named 'name'.\n\
 	-k|--mkcol\n\
@@ -135,15 +138,14 @@ void error_exit(int format, const char *fmt, ...) {
 		Submit the contents of 'file' to 'url' as a POST request.\n\
 		The content option '-T' is required.\n\
 	-u|--unlock\n\
-		Issue UNLOCK for 'url'. A token option '-t' is required.\n\
-	-v|--view\n\
-		View property information of 'url' using PROPFIND.\n\
-		With '-g', only the specified property is requested.\n\n"\
+		Issue UNLOCK for 'url'. A token option '-t' is required.\n\n"\
 	"Selection modifiers:\n\n\
 	-a|--auth <realm>\n\
 		Specify authentication realm for a request.\n\
 	-A|--proxy-auth <realm>\n\
 		Name the proxy authentication realm for the request.\n\
+	-f|--force\n\
+		Force overwriting target in copying or moving mode..\n\
 	-i|--timeout <timeout>\n\
 		Specify locking timeout interval. Default is `Infinite'.\n\
 	-N|--namespace <namespace-url>\n\
@@ -165,9 +167,11 @@ void error_exit(int format, const char *fmt, ...) {
 	-D|--debug\n\
 		Debug mode.\n\
 	-q|--quiet\n\
-		Print quietly: only properties, no headers.\n\
+		Minimal output. (not yet implemented)\n\
 	-S|--s-expr\n\
 		Print output as s-expressions.\n\
+	-v|--verbose\n\
+		Report verbosely, displaying keywords, etcetera.\n\
 	-V|--version\n\
 		Print version.\n"
 
@@ -288,7 +292,9 @@ int main(int argc, char * argv[]) {
 
 						}
 						break;
-			case 'g':	mode = 'v';
+			case 'F':	mode = 'F';
+						break;
+			case 'g':	mode = 'F';
 						{
 							ndPropPtr prp = ndPropNew();
 
@@ -312,8 +318,6 @@ int main(int argc, char * argv[]) {
 						break;
 			case 'o':	owner = optarg;
 						break;
-			case 'v':	mode = 'v';
-						break;
 			case 'd':	mode = 'd';
 						break;
 			case 'D':	debug = 1;
@@ -323,6 +327,8 @@ int main(int argc, char * argv[]) {
 			case 'S':	format |= ND_PRINT_AS_SEXP;
 						break;
 			case 'q':	format |= ND_PRINT_QUIETLY;
+						break;
+			case 'v':	format |= ND_PRINT_VERBOSELY;
 						break;
 			case 'a':	auth_realm = optarg;
 						break;
@@ -452,7 +458,7 @@ int main(int argc, char * argv[]) {
 					};
 					break;
 		case 'n':
-		case 'v':	{
+		case 'F':	{
 						ndNodeInfoPtr ret = NULL;
 						int code;
 						int depth;

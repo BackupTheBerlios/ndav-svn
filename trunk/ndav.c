@@ -281,10 +281,7 @@ void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
 	if ( NDAV_PRINT_HEADER(format) ) {
 		if (lock == NULL)
 			return;
-		if ( NDAV_PRINT_QUIETLY(format) ) {
-			if (lock->token)
-				fprintf(fp, "token=\"%s\"\n", lock->token);
-		} else {
+		if ( NDAV_PRINT_VERBOSELY(format) ) {
 			fprintf(fp, "Lock: ");
 			if (lock->token)
 				fprintf(fp, "token=\"%s\",\n", lock->token);
@@ -294,6 +291,9 @@ void ndLockInfoPrint(FILE * fp, ndLockInfoPtr lock, int format) {
 					 lock->owner_href ? lock->owner_href : "");
 			fprintf(fp, "      timeout=\"%s\"\n",
 					lock->timeout ? lock->timeout : "");
+		} else {
+			if (lock->token)
+				fprintf(fp, "token=\"%s\"\n", lock->token);
 		}
 	}
 	else if ( NDAV_PRINT_SEXP(format) ) {
@@ -366,8 +366,12 @@ void ndPropPrint(FILE * fp, ndPropPtr prop, int format) {
 				fprintf(fp, "%s", prop->name);
 			else if (prop->value && *prop->value == '\"')
 				fprintf(fp, "%s=%s", prop->name, prop->value);
-			else if (prop->value)
-				fprintf(fp, "%s=\"%s\"", prop->name, prop->value);
+			else if (prop->value) {
+				/* Remove initial whitespace. */
+				char *val = prop->value + strspn(prop->value, " \t\n");
+
+				fprintf(fp, "%s=\"%s\"", prop->name, val);
+			}
 		}
 		if (prop->ns)
 			fprintf(fp, "; ns=\"%s\"", prop->ns);
