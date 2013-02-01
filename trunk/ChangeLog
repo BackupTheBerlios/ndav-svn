@@ -1,3 +1,16 @@
+2013-01-29	Mats Erik Andersson <meand@users.berlios.de>
+
+	Change of semantics for "-m/--move" and "-c/--copy".
+	The latter replaces "-c/--copy-to".
+
+	* main.c (long_options): Rename "--copy-to" as "--copy".
+	(ND_USAGE): State that "-c/--copy" and "-m/--move"
+	carry "orig_url" as argument, letting "url" denote the
+	final destination for consistency with other options.
+	(main): Rename DEST_URL to ORIG_URL.
+	<'c', 'm'>: Update ORIG_URL from 'optarg'.  Update arguments
+	of ndCopy() and ndMove() to reflect new semantics.
+
 2013-01-12	Mats Erik Andersson <meand@users.berlios.de>
 
 	Use "-F/--find" for PROPFIND requests.

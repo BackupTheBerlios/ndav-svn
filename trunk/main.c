@@ -50,7 +50,7 @@ ndPropPtr propreq = NULL;
 static const char optstring[] = "a:c:de:fg:hi:klm:no:p:qrs:t:uvA:DFN:P:ST:V";
 
 static const struct option long_options[] = {
-	{"copy-to",	required_argument, 0, 'c'},
+	{"copy",	required_argument, 0, 'c'},
 	{"put",		required_argument, 0, 'p'},
 	{"move",	required_argument, 0, 'm'},
 	{"delete",	no_argument, 0, 'd'},
@@ -110,8 +110,8 @@ void error_exit(int format, const char *fmt, ...) {
 	"usage: %s [options] url\n\n"\
 	"If no option is given, the http-action GET is implied.\n\n"\
 	"Actions:\n\
-	-c|--copy-to <dest_url>\n\
-		Copy 'url' to 'dest_url'.\n\
+	-c|--copy <orig_url>\n\
+		Copy 'orig_url' to 'url'.\n\
 	-d|--delete\n\
 		Delete 'url'. Use a locking token if also '-t' is specified. \n\
 	-e|--edit-prop <name=value>\n\
@@ -126,8 +126,8 @@ void error_exit(int format, const char *fmt, ...) {
 		Create the collection 'url', i.e., MKCOL 'url'.\n\
 	-l|--lock\n\
 		Put a lock on 'url', i.e., LOCK 'url'.\n\
-	-m|--move <dest_url>\n\
-		Move 'url' to 'dest_url'.\n\
+	-m|--move <orig_url>\n\
+		Move 'orig_url' to 'url'.\n\
 	-n|--prop-name\n\
 		Retrieve all available property names of the specified url.\n\
 		This displays properties without value, but with name spaces.\n\
@@ -243,7 +243,7 @@ int main(int argc, char * argv[]) {
 	char *timeout = NULL;
 	char *infile = NULL;
 	char *owner = NULL;
-	char *dest_url = NULL;
+	char *orig_url = NULL;
 	char *content_type = "application/x-www-form-urlencoded";
 	char *auth_realm = NULL;
 	char *pauth_realm = NULL;
@@ -261,10 +261,10 @@ int main(int argc, char * argv[]) {
 	{
 		switch (optc) {
 			case 'c':	mode = 'c';
-						dest_url = optarg;
+						orig_url = optarg;
 						break;
 			case 'm':	mode = 'm';
-						dest_url = optarg;
+						orig_url = optarg;
 						break;
 			case 'e':	mode = 'e';
 						{
@@ -383,7 +383,7 @@ int main(int argc, char * argv[]) {
 		case 'c':	{
 						int code;
 
-						code = ndCopy(url, auth, dest_url,
+						code = ndCopy(orig_url, auth, url,
 										force_overwrite, token);
 						ndFreeAuthCtxt(auth);
 
@@ -413,7 +413,7 @@ int main(int argc, char * argv[]) {
 		case 'm':	{
 						int code;
 
-						code = ndMove(url, auth, dest_url,
+						code = ndMove(orig_url, auth, url,
 										force_overwrite, token);
 						ndFreeAuthCtxt(auth);
 
